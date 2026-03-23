@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>德州實體荷官(Dealer)專業認證</title>
+    <title>德州實體記分員(Dealer)專業認證</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -23,7 +23,7 @@
 
     <script>
         // ==========================================
-        // 題庫生成引擎 (產生 200 題專業荷官題庫)
+        // 題庫生成引擎 (產生 200 題專業記分員題庫)
         // ==========================================
         const generateQuestionBank = () => {
             let qList = [];
@@ -33,7 +33,7 @@
             const staticRules = [
                 {
                     category: '發牌與規則',
-                    question: '在發首發底牌時，荷官不小心將第一張牌（小盲注的牌）翻開了（Exposed card）。接下來該如何處理？',
+                    question: '在發首發底牌時，記分員不小心將第一張牌（小盲注的牌）翻開了（Exposed card）。接下來該如何處理？',
                     options: ['繼續發牌，該張牌做為第一張銷牌', '宣告誤發（Misdeal），收回所有牌重新洗牌發牌', '繼續發牌，這局結束後再換牌', '視為死牌，小盲注本局無法參與'],
                     correctAnswerIndex: 1,
                     explanation: '根據TDA標準規則，如果發出的第一張或第二張牌被翻開，必須宣告誤發（Misdeal），所有牌收回重新洗牌。'
@@ -43,7 +43,7 @@
                     question: '發牌時，若中間位置閒家的底牌不小心被翻開（非首兩張）怎麼處理？',
                     options: ['宣告誤發 (Misdeal)，全部重洗', '該玩家強制棄牌', '該牌將成為翻牌圈 (Flop) 的第一張銷牌，並補發一張原來的銷牌給該玩家', '直接換一張牌給他，被翻開的牌洗回牌堆'],
                     correctAnswerIndex: 2,
-                    explanation: '非首兩張的底牌若被翻開，不視為誤發。荷官應繼續完成發牌，最後將原本的銷牌發給該玩家，並將被翻開的牌作為翻牌圈的銷牌。'
+                    explanation: '非首兩張的底牌若被翻開，不視為誤發。記分員應繼續完成發牌，最後將原本的銷牌發給該玩家，並將被翻開的牌作為翻牌圈的銷牌。'
                 },
                 {
                     category: '分池規則',
@@ -75,7 +75,7 @@
                 },
                 {
                     category: '發牌與規則',
-                    question: '荷官在翻牌圈忘記銷牌 (Burn card)，直接發出三張公共牌，且尚未有玩家行動。應如何處理？',
+                    question: '記分員在翻牌圈忘記銷牌 (Burn card)，直接發出三張公共牌，且尚未有玩家行動。應如何處理？',
                     options: ['保留該三張牌不處理', '收回三張翻牌，重新洗牌後，正確銷一張牌再發出翻牌', '將第三張當銷牌，補發一張', '直接進入下一輪'],
                     correctAnswerIndex: 1,
                     explanation: '忘記銷牌且無人行動時，必須將錯誤的翻牌收回，與剩餘牌堆（不含第一輪的銷牌）洗勻，重新銷牌並發出正確的翻牌。'
@@ -97,41 +97,41 @@
                 {
                     category: '宣告與動作',
                     question: '玩家口頭宣告「加註 $500」，但實際上丟出 $1000 面額的籌碼且未要求找零。應視為多少？',
-                    options: ['加註 $1000', '加註 $500，荷官應找回 $500', '無效動作', '跟注'],
+                    options: ['加註 $1000', '加註 $500，記分員應找回 $500', '無效動作', '跟注'],
                     correctAnswerIndex: 1,
                     explanation: '口頭宣告優先（Verbal Declaration is Binding）。只要口頭宣告了 $500，無論丟出多大的籌碼，都視為加註 $500。'
                 },
                 {
                     category: '下注規則',
                     question: '玩家在 All-in 時，籌碼量「未達」最小合法加註額 (Short All-in)。前方已經行動過的玩家還能再加註嗎？',
-                    options: ['可以，只要籌碼夠', '不行，此下注無法重新開啟加註權限 (Re-open betting)，只能跟注', '由荷官決定', '可以，但只能加倍'],
+                    options: ['可以，只要籌碼夠', '不行，此下注無法重新開啟加註權限 (Re-open betting)，只能跟注', '由記分員決定', '可以，但只能加倍'],
                     correctAnswerIndex: 1,
                     explanation: '不足最小加註額的 All-in (Short All-in) 不會重新開啟已經行動過玩家的加註權限。他們面對這個 All-in 只能選擇跟注或棄牌。'
                 },
                 {
                     category: '發牌與規則',
                     question: '玩家為了看清楚遠處的公共牌，將自己的底牌拿離桌面或放到桌子邊緣外。這樣可以嗎？',
-                    options: ['可以，只要不給別人看', '違規。底牌必須隨時保持在桌面範圍及荷官視線內', '只有在單挑時可以', '由對手決定'],
+                    options: ['可以，只要不給別人看', '違規。底牌必須隨時保持在桌面範圍及記分員視線內', '只有在單挑時可以', '由對手決定'],
                     correctAnswerIndex: 1,
-                    explanation: '撲克安全規則要求玩家的底牌必須隨時保持在桌面邊界之內，並且在荷官的視線範圍內，以防作弊或換牌。'
+                    explanation: '撲克安全規則要求玩家的底牌必須隨時保持在桌面邊界之內，並且在記分員的視線範圍內，以防作弊或換牌。'
                 },
                 {
                     category: '發牌與規則',
-                    question: '如果荷官在發轉牌 (Turn) 時，不小心黏牌發出了兩張牌。該怎麼處理？',
+                    question: '如果記分員在發轉牌 (Turn) 時，不小心黏牌發出了兩張牌。該怎麼處理？',
                     options: ['兩張都作廢', '保留正確的第一張，第二張視為下一輪河牌 (River) 的銷牌', '重新洗牌', '讓玩家投票決定'],
                     correctAnswerIndex: 1,
                     explanation: '遇到發出多餘牌的情況，正確的那張轉牌保留。多出的那一張則提早作為河牌圈的銷牌（放在一旁，河牌時不再銷牌）。'
                 },
                 {
                     category: '發牌與規則',
-                    question: '荷官在前方玩家「尚未完成行動前」，就不小心提早發出了下一輪的公共牌 (Premature Deal)。處理方式？',
+                    question: '記分員在前方玩家「尚未完成行動前」，就不小心提早發出了下一輪的公共牌 (Premature Deal)。處理方式？',
                     options: ['該公共牌無效，將牌收回洗入牌堆，等待玩家行動完後重新發出', '保留該牌，強制玩家快速決定', '給未行動玩家補償籌碼', '該局直接平分'],
                     correctAnswerIndex: 0,
                     explanation: '提早發出的公共牌（Premature Deal）一律無效。必須收回與剩餘牌堆洗勻（不含之前的銷牌），待所有行動完成後重新發出。'
                 },
                 {
                     category: '盲注規則',
-                    question: '一位玩家在盲注位，但發牌時他剛好去洗手間不在座位上。荷官該怎麼做？',
+                    question: '一位玩家在盲注位，但發牌時他剛好去洗手間不在座位上。記分員該怎麼做？',
                     options: ['不發牌給他', '發牌給他，若輪到他行動時他還沒回來，則視為死牌並扣除盲注', '幫他下盲注，並替他過牌', '等他回來再發牌'],
                     correctAnswerIndex: 1,
                     explanation: '不在座位上的玩家依然會被發牌與扣除盲注。若輪到他行動（或發出最後一輪牌）時他仍未回座，其手牌將被直接視為死牌 (Mucked)。'
@@ -152,14 +152,14 @@
                 },
                 {
                     category: '流程規則',
-                    question: '洗牌後，荷官忘記讓玩家切牌 (Cut card) 就直接開始發牌。何時會被宣告為誤發 (Misdeal)？',
+                    question: '洗牌後，記分員忘記讓玩家切牌 (Cut card) 就直接開始發牌。何時會被宣告為誤發 (Misdeal)？',
                     options: ['發出第一張牌就誤發', '若已經發出兩張以上的牌，通常視為誤發，必須重新洗牌', '整局打完才算', '不影響，繼續打'],
                     correctAnswerIndex: 1,
                     explanation: '忘記切牌屬於程序錯誤，若已開始發牌（大於兩張），為確保公平性，應宣告誤發並重新洗牌。'
                 },
                 {
                     category: '籌碼規則',
-                    question: '玩家將籌碼向前推出越過下注線 (Forward motion)，隨後反悔想收回一半。荷官應如何判決？',
+                    question: '玩家將籌碼向前推出越過下注線 (Forward motion)，隨後反悔想收回一半。記分員應如何判決？',
                     options: ['允許收回', '越過下注線的籌碼必須全部留在池中', '警告一次，允許收回', '判決死牌'],
                     correctAnswerIndex: 1,
                     explanation: '向前推進規則 (Forward Motion Rule) 規定，只要籌碼被推進並越過下注線（或有明顯下注動作），就必須留在底池，不允許反悔收回。'
@@ -255,10 +255,10 @@
                 qList.push({
                     id: idCounter++,
                     category: '單一籌碼規則',
-                    question: `面對前方玩家 $${bet} 的下注，輪到某玩家時，他默默丟出一枚面額 $${chip} 的大籌碼，且「沒有」任何口頭宣告。身為荷官，這代表什麼動作？`,
+                    question: `面對前方玩家 $${bet} 的下注，輪到某玩家時，他默默丟出一枚面額 $${chip} 的大籌碼，且「沒有」任何口頭宣告。身為記分員，這代表什麼動作？`,
                     options: shuffled,
                     correctAnswerIndex: shuffled.indexOf(correctAns),
-                    explanation: `根據TDA「單一籌碼規則 (One-Chip Rule)」，面對下注時，若丟出一枚面額大於該下注額的單一籌碼且未宣告加註，一律視為「跟注 (Call)」，荷官需找零 $${chip - bet}。`
+                    explanation: `根據TDA「單一籌碼規則 (One-Chip Rule)」，面對下注時，若丟出一枚面額大於該下注額的單一籌碼且未宣告加註，一律視為「跟注 (Call)」，記分員需找零 $${chip - bet}。`
                 });
             }
 
@@ -308,9 +308,9 @@
             const oneChips = ALL_QUESTIONS.filter(q => q.category === '單一籌碼規則');
 
             // 結構化抽取：15題實務規則 + 3題最小加註 + 3題邊池 + 5題單一籌碼 = 30題
-            const selectedStatics = shuffleArray(statics).slice(0, 22);
-            const selectedMinRaises = shuffleArray(minRaises).slice(0, 3);
-            const selectedSidePots = shuffleArray(sidePots).slice(0, 3);
+            const selectedStatics = shuffleArray(statics).slice(0, 24);
+            const selectedMinRaises = shuffleArray(minRaises).slice(0, 2);
+            const selectedSidePots = shuffleArray(sidePots).slice(0, 2);
             const selectedOneChips = shuffleArray(oneChips).slice(0, 2);
 
             // 將這 30 題合併後，再進行一次全局洗牌，讓題目出現順序完全隨機
@@ -375,10 +375,10 @@
                         <i data-lucide="award" class="text-yellow-400 w-16 h-16"></i>
                     </div>
                     <div class="space-y-6 max-w-2xl">
-                        <h1 class="text-[2.5rem] font-bold text-emerald-400 tracking-wide drop-shadow-md">德州實體荷官(Dealer)專業認證</h1>
+                        <h1 class="text-[2.5rem] font-bold text-emerald-400 tracking-wide drop-shadow-md">德州實體記分員(Dealer)專業認證</h1>
                         <p class="text-slate-300 text-lg leading-relaxed px-4">
                             本系統內建國際標準(TDA)專業題庫。涵蓋流程判斷、盲注規則、邊池計算與最小加註額速算。<br/><br/>
-                            每次嚴格配比抽出<span class="font-bold text-yellow-400 text-2xl mx-1">${QUESTIONS_PER_SESSION}</span>題不同情境之題型進行綜合測驗。準備好挑戰您的荷官專業度了嗎？
+                            每次嚴格配比抽出<span class="font-bold text-yellow-400 text-2xl mx-1">${QUESTIONS_PER_SESSION}</span>題不同情境之題型進行綜合測驗。準備好挑戰您的記分員專業度了嗎？
                         </p>
                     </div>
                     <div class="pt-6">
@@ -514,7 +514,7 @@
             let feedbackMsg = "";
             let feedbackColor = "";
             
-            if (percentage >= 90) { feedbackMsg = "卓越！具備國際賽事級別專業荷官水準！"; feedbackColor = "text-yellow-400"; }
+            if (percentage >= 90) { feedbackMsg = "卓越！具備國際賽事級別專業記分員水準！"; feedbackColor = "text-yellow-400"; }
             else if (percentage >= 75) { feedbackMsg = "優秀！對規則有很好的掌握，稍加練習即可上桌。"; feedbackColor = "text-emerald-400"; }
             else if (percentage >= 60) { feedbackMsg = "及格！基本概念有，但在計算與特殊規則上需多加複習。"; feedbackColor = "text-orange-400"; }
             else { feedbackMsg = "需加強！建議重新熟讀 TDA 規則及底池計算方式。"; feedbackColor = "text-red-400"; }
