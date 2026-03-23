@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>德州撲克荷官認證題庫</title>
+    <title>德州實體荷官(Dealer)專業認證</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -16,7 +16,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-50 font-sans selection:bg-emerald-500/30 min-h-screen p-4 md:p-8">
+<body class="bg-[#0f172a] text-slate-50 font-sans selection:bg-emerald-500/30 min-h-screen p-4 md:p-8">
     <div id="app" class="max-w-5xl mx-auto">
         <!-- 內容由 JavaScript 動態渲染 -->
     </div>
@@ -29,7 +29,7 @@
             let qList = [];
             let idCounter = 1;
 
-            // 1. 核心靜態規則題 (20題)
+            // 1. 核心靜態規則題 (擴充至包含各種情境)
             const staticRules = [
                 {
                     category: '發牌與規則',
@@ -96,10 +96,10 @@
                 },
                 {
                     category: '宣告與動作',
-                    question: '玩家口頭宣告「加註 500分」，但實際上丟出 1000分 面額的籌碼且未要求找零。應視為多少？',
-                    options: ['加註 1000分', '加註 500分，荷官應找回 500分', '無效動作', '跟注'],
+                    question: '玩家口頭宣告「加註 $500」，但實際上丟出 $1000 面額的籌碼且未要求找零。應視為多少？',
+                    options: ['加註 $1000', '加註 $500，荷官應找回 $500', '無效動作', '跟注'],
                     correctAnswerIndex: 1,
-                    explanation: '口頭宣告優先（Verbal Declaration is Binding）。只要口頭宣告了 500分，無論丟出多大的籌碼，都視為加註 500分。'
+                    explanation: '口頭宣告優先（Verbal Declaration is Binding）。只要口頭宣告了 $500，無論丟出多大的籌碼，都視為加註 $500。'
                 },
                 {
                     category: '下注規則',
@@ -144,6 +144,13 @@
                     explanation: '公共牌已經是最大的順子（Broadway），兩人底牌都無法組成更大的五張牌。因此兩人皆使用公共牌的五張，平分底池。'
                 },
                 {
+                    category: '判定規則',
+                    question: '公共牌為 A-A-K-K-Q。玩家A底牌為 J-J，玩家B底牌為 10-10。誰贏得底池？',
+                    options: ['平分底池 (Split Pot)', '玩家A贏', '玩家B贏', '由花色決定'],
+                    correctAnswerIndex: 0,
+                    explanation: '兩人的最大五張牌組合都是 A-A-K-K-Q（也就是打公共牌 Play the board）。底牌的 J 或 10 都無法替換掉公共牌中的 Q，因此平分。'
+                },
+                {
                     category: '流程規則',
                     question: '洗牌後，荷官忘記讓玩家切牌 (Cut card) 就直接開始發牌。何時會被宣告為誤發 (Misdeal)？',
                     options: ['發出第一張牌就誤發', '若已經發出兩張以上的牌，通常視為誤發，必須重新洗牌', '整局打完才算', '不影響，繼續打'],
@@ -166,10 +173,10 @@
                 },
                 {
                     category: '宣告與動作',
-                    question: '翻牌前，玩家A下注 100分，玩家B丟出一枚 1000分 籌碼並喊「加註(Raise)」，但沒說金額。此時加註金額是多少？',
-                    options: ['加註到 200分', '加註到 1000分', '由玩家B重新決定', '無效動作'],
+                    question: '翻牌前，玩家A下注 $100，玩家B丟出一枚 $1000 籌碼並喊「加註(Raise)」，但沒說金額。此時加註金額是多少？',
+                    options: ['加註到 $200', '加註到 $1000', '由玩家B重新決定', '無效動作'],
                     correctAnswerIndex: 1,
-                    explanation: '若玩家宣告加註，且丟出單一枚超大面額籌碼而沒有宣告特定金額，則加註總額視為該枚籌碼的完整面額（即 1000分）。'
+                    explanation: '若玩家宣告加註，且丟出單一枚超大面額籌碼而沒有宣告特定金額，則加註總額視為該枚籌碼的完整面額（即 $1000）。'
                 }
             ];
 
@@ -188,22 +195,22 @@
                 const raiseTotal = bet + raiseAmount;
                 const minReraise = raiseTotal + raiseAmount;
 
-                const correctAns = `${minReraise}分`;
+                const correctAns = `$${minReraise}`;
                 const options = [
                     correctAns,
-                    `${raiseTotal + bet}分`,
-                    `${raiseTotal * 2}分`,
-                    `${minReraise + blinds.bb}分`
+                    `$${raiseTotal + bet}`,
+                    `$${raiseTotal * 2}`,
+                    `$${minReraise + blinds.bb}`
                 ];
                 const shuffled = options.sort(() => Math.random() - 0.5);
 
                 qList.push({
                     id: idCounter++,
-                    category: '最小加註計算 (Min Raise)',
-                    question: `盲注級別 ${blinds.sb}/${blinds.bb}分。翻牌後，玩家A下注 ${bet}分，玩家B加註到總額 ${raiseTotal}分。請問如果玩家C想要再加註（Re-raise），最低的加註總額應該是多少？`,
+                    category: '最小加註計算',
+                    question: `盲注級別 $${blinds.sb}/$${blinds.bb}。翻牌後，玩家A下注 $${bet}，玩家B加註到總額 $${raiseTotal}。請問如果玩家C想要再加註（Re-raise），最低的加註總額應該是多少？`,
                     options: shuffled,
                     correctAnswerIndex: shuffled.indexOf(correctAns),
-                    explanation: `玩家B加註到 ${raiseTotal}分，相對於玩家A的 ${bet}分，實際加註額為 ${raiseAmount}分。下一位玩家的最小加註總額必須是「目前的總注額加上前一次的加註額」，即 ${raiseTotal}分 + ${raiseAmount}分 = ${minReraise}分。`
+                    explanation: `玩家B加註到 $${raiseTotal}，相對於玩家A的 $${bet}，實際加註額為 $${raiseAmount}。下一位玩家的最小加註總額必須是「目前的總注額加上前一次的加註額」，即 $${raiseTotal} + $${raiseAmount} = $${minReraise}。`
                 });
             }
 
@@ -215,22 +222,22 @@
                 const mainPot = A * 3;
                 const sidePot = diff * 2;
 
-                const correctAns = `主池: ${mainPot}分, 邊池: ${sidePot}分`;
+                const correctAns = `主池: $${mainPot}, 邊池: $${sidePot}`;
                 const options = [
                     correctAns,
-                    `主池: ${A * 2}分, 邊池: ${B * 2}分`,
-                    `主池: ${mainPot + sidePot}分, 邊池: 0分`,
-                    `主池: ${mainPot}分, 邊池: ${diff * 3}分`
+                    `主池: $${A * 2}, 邊池: $${B * 2}`,
+                    `主池: $${mainPot + sidePot}, 邊池: $0`,
+                    `主池: $${mainPot}, 邊池: $${diff * 3}`
                 ];
                 const shuffled = options.sort(() => Math.random() - 0.5);
 
                 qList.push({
                     id: idCounter++,
-                    category: '邊池計算 (Side Pot)',
-                    question: `三人局。玩家A籌碼 ${A}分 全押 (All-in)，玩家B籌碼 ${B}分 也全押，玩家C籌碼最多並宣告跟注 (Call)。請問主池與邊池分別是多少？`,
+                    category: '邊池計算',
+                    question: `三人局。玩家A籌碼 $${A} 全押 (All-in)，玩家B籌碼 $${B} 也全押，玩家C籌碼最多並宣告跟注 (Call)。請問主池與邊池分別是多少？`,
                     options: shuffled,
                     correctAnswerIndex: shuffled.indexOf(correctAns),
-                    explanation: `主池由3人共同承擔最小 All-in 者(A)的金額：${A}分 x 3 = ${mainPot}分。邊池由剩餘2人(B與C)承擔B多出來的金額(${B}分 - ${A}分 = ${diff}分)：${diff}分 x 2 = ${sidePot}分。`
+                    explanation: `主池由3人共同承擔最小 All-in 者(A)的金額：$${A} x 3 = $${mainPot}。邊池由剩餘2人(B與C)承擔B多出來的金額($${B} - $${A} = $${diff})：$${diff} x 2 = $${sidePot}。`
                 });
             }
 
@@ -247,11 +254,11 @@
 
                 qList.push({
                     id: idCounter++,
-                    category: '籌碼動作判定',
-                    question: `面對前方玩家 ${bet}分 的下注，輪到某玩家時，他默默丟出一枚面額 ${chip}分 的大籌碼，且「沒有」任何口頭宣告。身為荷官，這代表什麼動作？`,
+                    category: '單一籌碼規則',
+                    question: `面對前方玩家 $${bet} 的下注，輪到某玩家時，他默默丟出一枚面額 $${chip} 的大籌碼，且「沒有」任何口頭宣告。身為荷官，這代表什麼動作？`,
                     options: shuffled,
                     correctAnswerIndex: shuffled.indexOf(correctAns),
-                    explanation: `根據TDA「單一籌碼規則 (One-Chip Rule)」，面對下注時，若丟出一枚面額大於該下注額的單一籌碼且未宣告加註，一律視為「跟注 (Call)」，荷官需找零 ${chip - bet}分。`
+                    explanation: `根據TDA「單一籌碼規則 (One-Chip Rule)」，面對下注時，若丟出一枚面額大於該下注額的單一籌碼且未宣告加註，一律視為「跟注 (Call)」，荷官需找零 $${chip - bet}。`
                 });
             }
 
@@ -274,6 +281,9 @@
             history: []
         };
 
+        // 陣列洗牌工具
+        const shuffleArray = (array) => [...array].sort(() => 0.5 - Math.random());
+
         // 更新畫面
         function render() {
             const app = document.getElementById('app');
@@ -290,8 +300,24 @@
 
         // 綁定至 window 以便 HTML 內聯 onclick 呼叫
         window.startPractice = () => {
-            const shuffled = [...ALL_QUESTIONS].sort(() => 0.5 - Math.random());
-            state.sessionQuestions = shuffled.slice(0, QUESTIONS_PER_SESSION);
+            // 分類題庫以確保每次測驗的題型多樣性，避免同類型題目連發
+            const dynamicCategories = ['最小加註計算', '邊池計算', '單一籌碼規則'];
+            const statics = ALL_QUESTIONS.filter(q => !dynamicCategories.includes(q.category));
+            const minRaises = ALL_QUESTIONS.filter(q => q.category === '最小加註計算');
+            const sidePots = ALL_QUESTIONS.filter(q => q.category === '邊池計算');
+            const oneChips = ALL_QUESTIONS.filter(q => q.category === '單一籌碼規則');
+
+            // 結構化抽取：15題實務規則 + 3題最小加註 + 3題邊池 + 5題單一籌碼 = 30題
+            const selectedStatics = shuffleArray(statics).slice(0, 22);
+            const selectedMinRaises = shuffleArray(minRaises).slice(0, 3);
+            const selectedSidePots = shuffleArray(sidePots).slice(0, 3);
+            const selectedOneChips = shuffleArray(oneChips).slice(0, 2);
+
+            // 將這 30 題合併後，再進行一次全局洗牌，讓題目出現順序完全隨機
+            let finalQuestions = [...selectedStatics, ...selectedMinRaises, ...selectedSidePots, ...selectedOneChips];
+            finalQuestions = shuffleArray(finalQuestions);
+
+            state.sessionQuestions = finalQuestions;
             state.gameState = 'quiz';
             state.currentIndex = 0;
             state.score = 0;
@@ -344,25 +370,26 @@
         // ==========================================
         function renderStartScreen() {
             return `
-                <div class="flex flex-col items-center justify-center min-h-[500px] text-center space-y-8 animate-fade-in">
-                    <div class="bg-emerald-900/40 p-6 rounded-full border-4 border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
-                        <i data-lucide="trophy" class="text-yellow-400 w-16 h-16"></i>
+                <div class="flex flex-col items-center justify-center min-h-[600px] text-center space-y-8 animate-fade-in">
+                    <div class="bg-emerald-900/30 p-6 rounded-full border-[3px] border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                        <i data-lucide="award" class="text-yellow-400 w-16 h-16"></i>
                     </div>
-                    <div class="space-y-4 max-w-xl">
-                        <h1 class="text-4xl font-bold text-emerald-400 drop-shadow-md">德州撲克荷官 (Dealer) 專業認證</h1>
-                        <p class="text-slate-300 text-lg">
-                            本系統內建 200 題國際標準 (TDA) 專業題庫。涵蓋流程判斷、盲注規則、邊池計算與最小加註額速算。<br/><br/>
-                            每次隨機抽選 <span class="font-bold text-yellow-400 text-xl">${QUESTIONS_PER_SESSION}</span> 題進行測驗。準備好挑戰您的荷官專業度了嗎？
+                    <div class="space-y-6 max-w-2xl">
+                        <h1 class="text-[2.5rem] font-bold text-emerald-400 tracking-wide drop-shadow-md">德州實體荷官(Dealer)專業認證</h1>
+                        <p class="text-slate-300 text-lg leading-relaxed px-4">
+                            本系統內建國際標準(TDA)專業題庫。涵蓋流程判斷、盲注規則、邊池計算與最小加註額速算。<br/><br/>
+                            每次嚴格配比抽出<span class="font-bold text-yellow-400 text-2xl mx-1">${QUESTIONS_PER_SESSION}</span>題不同情境之題型進行綜合測驗。準備好挑戰您的荷官專業度了嗎？
                         </p>
                     </div>
-                    <button 
-                        onclick="startPractice()"
-                        class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-full text-xl font-bold transition-all transform hover:scale-105 shadow-lg"
-                    >
-                        <i data-lucide="play" class="fill-current w-6 h-6"></i>
-                        開始專業測驗
-                    </button>
-                    <div class="text-emerald-700 font-mono text-sm">Question Bank: ${ALL_QUESTIONS.length} Questions Loaded</div>
+                    <div class="pt-6">
+                        <button 
+                            onclick="startPractice()"
+                            class="flex items-center gap-3 bg-[#0f9d58] hover:bg-emerald-600 text-white px-10 py-4 rounded-full text-xl font-bold transition-all transform hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(16,185,129,0.39)]"
+                        >
+                            <i data-lucide="play" class="fill-current w-6 h-6"></i>
+                            開始專業測試
+                        </button>
+                    </div>
                 </div>
             `;
         }
@@ -371,27 +398,27 @@
             const q = state.sessionQuestions[state.currentIndex];
             
             const optionsHtml = q.options.map((opt, idx) => {
-                let btnStyle = "bg-slate-700/50 border-slate-600 hover:bg-slate-700 hover:border-slate-500 text-slate-200 cursor-pointer";
+                let btnStyle = "bg-[#1e293b] border-slate-700 hover:bg-slate-700 hover:border-slate-500 text-slate-200 cursor-pointer shadow-sm";
                 let iconHtml = "";
                 
                 if (state.isSubmitted) {
-                    btnStyle = "bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-default";
+                    btnStyle = "bg-[#1e293b] border-slate-700 text-slate-500 opacity-60 cursor-default";
                     if (idx === q.correctAnswerIndex) {
-                        btnStyle = "bg-green-900/40 border-green-500 text-green-300 cursor-default"; 
-                        iconHtml = `<i data-lucide="check-circle-2" class="text-green-500"></i>`;
+                        btnStyle = "bg-emerald-900/30 border-emerald-500/50 text-emerald-300 cursor-default"; 
+                        iconHtml = `<i data-lucide="check-circle-2" class="text-emerald-500"></i>`;
                     } else if (idx === state.selectedOption) {
-                        btnStyle = "bg-red-900/40 border-red-500 text-red-300 cursor-default"; 
+                        btnStyle = "bg-red-900/30 border-red-500/50 text-red-300 cursor-default"; 
                         iconHtml = `<i data-lucide="x-circle" class="text-red-500"></i>`;
                     }
                 } else if (state.selectedOption === idx) {
-                    btnStyle = "bg-emerald-900/50 border-emerald-500 text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.2)]"; 
+                    btnStyle = "bg-[#1e293b] border-emerald-500 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.2)]"; 
                 }
 
                 return `
                     <button
                         ${state.isSubmitted ? 'disabled' : ''}
                         onclick="setSelectedOption(${idx})"
-                        class="w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between ${btnStyle}"
+                        class="w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center justify-between ${btnStyle}"
                     >
                         <span class="text-lg">${opt}</span>
                         ${iconHtml}
@@ -403,7 +430,7 @@
             if (!state.isSubmitted) {
                 const btnClass = state.selectedOption !== null 
                     ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg cursor-pointer' 
-                    : 'bg-slate-700 text-slate-500 cursor-not-allowed';
+                    : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed';
                 
                 feedbackHtml = `
                     <button
@@ -416,11 +443,11 @@
                 `;
             } else {
                 const isCorrect = state.selectedOption === q.correctAnswerIndex;
-                const alertStyle = isCorrect ? 'bg-green-900/20 border-green-500/50' : 'bg-red-900/20 border-red-500/50';
-                const titleColor = isCorrect ? 'text-green-400' : 'text-red-400';
+                const alertStyle = isCorrect ? 'bg-emerald-900/20 border-emerald-500/50' : 'bg-red-900/20 border-red-500/50';
+                const titleColor = isCorrect ? 'text-emerald-400' : 'text-red-400';
                 const titleText = isCorrect ? '正確！' : '錯誤！';
                 const iconHtml = isCorrect 
-                    ? `<i data-lucide="check-circle-2" class="text-green-400"></i>` 
+                    ? `<i data-lucide="check-circle-2" class="text-emerald-400"></i>` 
                     : `<i data-lucide="alert-triangle" class="text-red-400"></i>`;
                 const btnText = state.currentIndex < QUESTIONS_PER_SESSION - 1 ? '下一題' : '查看結算成績';
 
@@ -435,7 +462,7 @@
                         </div>
                         <button
                             onclick="handleNext()"
-                            class="w-full flex items-center justify-center gap-2 bg-yellow-600 hover:bg-yellow-500 text-white py-4 rounded-xl text-xl font-bold transition-all shadow-lg"
+                            class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-xl text-xl font-bold transition-all shadow-lg"
                         >
                             ${btnText}
                             <i data-lucide="chevron-right"></i>
@@ -447,35 +474,35 @@
             return `
                 <div class="max-w-3xl mx-auto w-full flex flex-col space-y-6 animate-fade-in">
                     <!-- Progress Header -->
-                    <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm">
+                    <div class="flex justify-between items-center bg-[#1e293b] p-4 rounded-xl border border-slate-700 shadow-sm">
                         <div class="space-y-1">
-                            <span class="text-sm text-slate-400 font-semibold uppercase tracking-wider">Progress</span>
+                            <span class="text-sm text-slate-400 font-semibold uppercase tracking-wider">進度</span>
                             <div class="text-xl font-bold text-emerald-400">
-                                Question ${state.currentIndex + 1} <span class="text-slate-500">/ ${QUESTIONS_PER_SESSION}</span>
+                                題目 ${state.currentIndex + 1} <span class="text-slate-500">/ ${QUESTIONS_PER_SESSION}</span>
                             </div>
                         </div>
                         <div class="space-y-1 text-right">
-                            <span class="text-sm text-slate-400 font-semibold uppercase tracking-wider">Score</span>
+                            <span class="text-sm text-slate-400 font-semibold uppercase tracking-wider">得分</span>
                             <div class="text-xl font-bold text-yellow-400">${state.score}</div>
                         </div>
                     </div>
 
                     <!-- Question Card -->
-                    <div class="bg-slate-800 border border-slate-700 p-6 md:p-8 rounded-2xl shadow-xl space-y-6">
-                        <span class="inline-block px-3 py-1 bg-emerald-900/50 text-emerald-300 text-sm font-bold rounded-lg border border-emerald-800/50">
+                    <div class="bg-transparent space-y-6">
+                        <span class="inline-block px-3 py-1 bg-emerald-900/30 text-emerald-400 text-sm font-bold rounded-lg border border-emerald-800/50">
                             ${q.category}
                         </span>
-                        <h2 class="text-2xl font-medium text-slate-100 leading-relaxed">
+                        <h2 class="text-[1.35rem] font-medium text-slate-100 leading-relaxed tracking-wide">
                             ${q.question}
                         </h2>
 
-                        <div class="space-y-3 pt-4">
+                        <div class="space-y-4 pt-4">
                             ${optionsHtml}
                         </div>
                     </div>
 
                     <!-- Feedback & Actions -->
-                    <div class="min-h-[120px]">
+                    <div class="min-h-[120px] pt-4">
                         ${feedbackHtml}
                     </div>
                 </div>
@@ -497,7 +524,7 @@
 
             if (wrongAnswers.length > 0) {
                 const listHtml = wrongAnswers.map(item => `
-                    <div class="bg-slate-800/80 border border-red-900/50 p-6 rounded-xl space-y-3">
+                    <div class="bg-[#1e293b] border border-red-900/50 p-6 rounded-xl space-y-3">
                         <span class="text-xs font-bold text-red-400 uppercase tracking-wider bg-red-900/30 px-2 py-1 rounded">${item.category}</span>
                         <p class="text-lg text-slate-200 font-medium">${item.question}</p>
                         <div class="bg-slate-900/50 p-4 rounded-lg space-y-2 text-sm">
@@ -506,11 +533,11 @@
                                 <span class="text-slate-400">你的答案：<span class="text-red-300 line-through">${item.userAnswer}</span></span>
                             </div>
                             <div class="flex items-start gap-2">
-                                <i data-lucide="check-circle-2" class="text-green-500 shrink-0 mt-0.5 w-5 h-5"></i>
-                                <span class="text-slate-400">正確答案：<span class="text-green-400 font-bold">${item.correctAnswer}</span></span>
+                                <i data-lucide="check-circle-2" class="text-emerald-500 shrink-0 mt-0.5 w-5 h-5"></i>
+                                <span class="text-slate-400">正確答案：<span class="text-emerald-400 font-bold">${item.correctAnswer}</span></span>
                             </div>
                         </div>
-                        <div class="text-slate-300 text-sm bg-slate-700/30 p-4 rounded-lg border-l-4 border-emerald-500">
+                        <div class="text-slate-300 text-sm bg-[#0f172a] p-4 rounded-lg border-l-4 border-emerald-500">
                             <span class="font-bold text-emerald-400 block mb-1">解析說明：</span>
                             ${item.explanation}
                         </div>
@@ -518,7 +545,7 @@
                 `).join('');
 
                 wrongAnswersHtml = `
-                    <div class="space-y-4">
+                    <div class="space-y-4 pt-8">
                         <h3 class="text-2xl font-bold text-slate-200 border-b border-slate-700 pb-2">錯誤題目檢討</h3>
                         ${listHtml}
                     </div>
@@ -527,11 +554,11 @@
 
             return `
                 <div class="max-w-4xl mx-auto w-full space-y-8 animate-fade-in">
-                    <div class="bg-slate-800 border border-slate-700 p-8 rounded-2xl shadow-xl text-center space-y-6">
+                    <div class="bg-[#1e293b] border border-slate-700 p-8 rounded-2xl shadow-xl text-center space-y-6">
                         <h2 class="text-3xl font-bold text-slate-200">測驗結算報告</h2>
                         
                         <div class="flex justify-center py-6">
-                            <div class="relative w-48 h-48 rounded-full border-8 border-slate-700 flex flex-col items-center justify-center bg-slate-900 shadow-inner">
+                            <div class="relative w-48 h-48 rounded-full border-8 border-slate-700 flex flex-col items-center justify-center bg-[#0f172a] shadow-inner">
                                 <span class="text-5xl font-black ${feedbackColor}">${percentage}%</span>
                                 <span class="text-slate-400 mt-2 font-semibold">${state.score} / ${QUESTIONS_PER_SESSION} 答對</span>
                             </div>
@@ -539,13 +566,15 @@
                         
                         <p class="text-xl font-bold ${feedbackColor}">${feedbackMsg}</p>
                         
-                        <button
-                            onclick="startPractice()"
-                            class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg mx-auto"
-                        >
-                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-                            重新挑戰 (隨機新題)
-                        </button>
+                        <div class="pt-4">
+                            <button
+                                onclick="startPractice()"
+                                class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg mx-auto"
+                            >
+                                <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                                重新挑戰 (隨機新題)
+                            </button>
+                        </div>
                     </div>
 
                     ${wrongAnswersHtml}
