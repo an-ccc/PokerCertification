@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德州撲克荷官認證題庫</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-50 font-sans selection:bg-emerald-500/30 min-h-screen p-4 md:p-8">
+    <div id="app" class="max-w-5xl mx-auto">
+        <!-- 內容由 JavaScript 動態渲染 -->
+    </div>
+
+    <script>
+        // ==========================================
+        // 題庫生成引擎 (產生 200 題專業荷官題庫)
+        // ==========================================
+        const generateQuestionBank = () => {
+            let qList = [];
+            let idCounter = 1;
+
+            // 1. 核心靜態規則題 (20題)
+            const staticRules = [
+                {
+                    category: '發牌與規則',
+                    question: '在發首發底牌時，荷官不小心將第一張牌（小盲注的牌）翻開了（Exposed card）。接下來該如何處理？',
+                    options: ['繼續發牌，該張牌做為第一張銷牌', '宣告誤發（Misdeal），收回所有牌重新洗牌發牌', '繼續發牌，這局結束後再換牌', '視為死牌，小盲注本局無法參與'],
+                    correctAnswerIndex: 1,
+                    explanation: '根據TDA標準規則，如果發出的第一張或第二張牌被翻開，必須宣告誤發（Misdeal），所有牌收回重新洗牌。'
+                },
+                {
+                    category: '發牌與規則',
+                    question: '發牌時，若中間位置閒家的底牌不小心被翻開（非首兩張）怎麼處理？',
+                    options: ['宣告誤發 (Misdeal)，全部重洗', '該玩家強制棄牌', '該牌將成為翻牌圈 (Flop) 的第一張銷牌，並補發一張原來的銷牌給該玩家', '直接換一張牌給他，被翻開的牌洗回牌堆'],
+                    correctAnswerIndex: 2,
+                    explanation: '非首兩張的底牌若被翻開，不視為誤發。荷官應繼續完成發牌，最後將原本的銷牌發給該玩家，並將被翻開的牌作為翻牌圈的銷牌。'
+                },
+                {
+                    category: '分池規則',
+                    question: '兩位玩家平分底池，出現一枚無法平分的最小面額畸零籌碼 (Odd chip)。這枚籌碼應該發給誰？',
+                    options: ['按鈕位 (Button) 玩家', '按鈕位左手邊第一個參與分池的玩家 (小盲方向)', '按鈕位右手邊第一個參與分池的玩家', '留在底池作為下一局的獎金'],
+                    correctAnswerIndex: 1,
+                    explanation: '無法平分的畸零籌碼，必須發給參與分池且位置最靠前（Out of position，即按鈕位左側順時針第一位）的玩家。'
+                },
+                {
+                    category: '攤牌規則',
+                    question: '攤牌時，若河牌圈 (River) 無人下注（大家都過牌 Check），該由誰先亮牌？',
+                    options: ['按鈕位 (Button) 玩家', '由按鈕位左手邊第一位還在局內的玩家先亮', '籌碼最多的玩家', '最後一輪有加註的玩家'],
+                    correctAnswerIndex: 1,
+                    explanation: '若最後一輪無人下注，亮牌順序由按鈕位左側第一位玩家開始順時針亮牌。'
+                },
+                {
+                    category: '攤牌規則',
+                    question: '攤牌時，若河牌圈 (River) 有玩家下注並被跟注，該由誰先亮牌？',
+                    options: ['最後一個採取激進動作（下注或加註）的玩家先亮牌', '跟注的玩家先亮牌', '按鈕位玩家', '籌碼最少的玩家'],
+                    correctAnswerIndex: 0,
+                    explanation: '在最後一輪有下注動作的情況下，由最後一個下注或加註（Aggressor）的玩家優先亮牌。'
+                },
+                {
+                    category: '下注規則',
+                    question: '玩家分兩次將籌碼放入底池（未事先口頭宣告加註），這是什麼行為？',
+                    options: ['合法加註', '分次下注 (String Bet)，違規，只能視為跟注', '直接判決死牌', '視為全押'],
+                    correctAnswerIndex: 1,
+                    explanation: '這被稱為分次下注 (String Bet)。若未事先宣告加註金額，玩家必須一次性將所有籌碼推入池中。分次推入只能被視為跟注 (Call)。'
+                },
+                {
+                    category: '發牌與規則',
+                    question: '荷官在翻牌圈忘記銷牌 (Burn card)，直接發出三張公共牌，且尚未有玩家行動。應如何處理？',
+                    options: ['保留該三張牌不處理', '收回三張翻牌，重新洗牌後，正確銷一張牌再發出翻牌', '將第三張當銷牌，補發一張', '直接進入下一輪'],
+                    correctAnswerIndex: 1,
+                    explanation: '忘記銷牌且無人行動時，必須將錯誤的翻牌收回，與剩餘牌堆（不含第一輪的銷牌）洗勻，重新銷牌並發出正確的翻牌。'
+                },
+                {
+                    category: '流程規則',
+                    question: '玩家在未輪到他時提早行動 (Action out of turn)，宣佈跟注。若輪到他時，前方玩家有人加註，他的提早行動有效嗎？',
+                    options: ['依然有效，必須跟注加註額', '無效，他可以重新決定要跟注、加註或棄牌', '有效，但他不能再加註', '視為死牌'],
+                    correctAnswerIndex: 1,
+                    explanation: '如果前方玩家的行動發生改變（如加註），提早行動的玩家可以收回之前的決定，重新選擇所有合法動作。'
+                },
+                {
+                    category: '盲注規則',
+                    question: '如果小盲注玩家在上一局被淘汰，這一局的按鈕 (Button) 該怎麼擺？',
+                    options: ['按鈕移動到大盲注位置', '按鈕移動到空位上（Dead Button），該局無小盲注，大盲正常', '按鈕不移動，下一局再移', '重新抽籤決定按鈕'],
+                    correctAnswerIndex: 1,
+                    explanation: '遇到這種情況實施「死按鈕 (Dead Button)」規則。按鈕會移動到被淘汰玩家的空位上，確保大盲注位置正確推進，該局沒有小盲注。'
+                },
+                {
+                    category: '宣告與動作',
+                    question: '玩家口頭宣告「加註 500分」，但實際上丟出 1000分 面額的籌碼且未要求找零。應視為多少？',
+                    options: ['加註 1000分', '加註 500分，荷官應找回 500分', '無效動作', '跟注'],
+                    correctAnswerIndex: 1,
+                    explanation: '口頭宣告優先（Verbal Declaration is Binding）。只要口頭宣告了 500分，無論丟出多大的籌碼，都視為加註 500分。'
+                },
+                {
+                    category: '下注規則',
+                    question: '玩家在 All-in 時，籌碼量「未達」最小合法加註額 (Short All-in)。前方已經行動過的玩家還能再加註嗎？',
+                    options: ['可以，只要籌碼夠', '不行，此下注無法重新開啟加註權限 (Re-open betting)，只能跟注', '由荷官決定', '可以，但只能加倍'],
+                    correctAnswerIndex: 1,
+                    explanation: '不足最小加註額的 All-in (Short All-in) 不會重新開啟已經行動過玩家的加註權限。他們面對這個 All-in 只能選擇跟注或棄牌。'
+                },
+                {
+                    category: '發牌與規則',
+                    question: '玩家為了看清楚遠處的公共牌，將自己的底牌拿離桌面或放到桌子邊緣外。這樣可以嗎？',
+                    options: ['可以，只要不給別人看', '違規。底牌必須隨時保持在桌面範圍及荷官視線內', '只有在單挑時可以', '由對手決定'],
+                    correctAnswerIndex: 1,
+                    explanation: '撲克安全規則要求玩家的底牌必須隨時保持在桌面邊界之內，並且在荷官的視線範圍內，以防作弊或換牌。'
+                },
+                {
+                    category: '發牌與規則',
+                    question: '如果荷官在發轉牌 (Turn) 時，不小心黏牌發出了兩張牌。該怎麼處理？',
+                    options: ['兩張都作廢', '保留正確的第一張，第二張視為下一輪河牌 (River) 的銷牌', '重新洗牌', '讓玩家投票決定'],
+                    correctAnswerIndex: 1,
+                    explanation: '遇到發出多餘牌的情況，正確的那張轉牌保留。多出的那一張則提早作為河牌圈的銷牌（放在一旁，河牌時不再銷牌）。'
+                },
+                {
+                    category: '發牌與規則',
+                    question: '荷官在前方玩家「尚未完成行動前」，就不小心提早發出了下一輪的公共牌 (Premature Deal)。處理方式？',
+                    options: ['該公共牌無效，將牌收回洗入牌堆，等待玩家行動完後重新發出', '保留該牌，強制玩家快速決定', '給未行動玩家補償籌碼', '該局直接平分'],
+                    correctAnswerIndex: 0,
+                    explanation: '提早發出的公共牌（Premature Deal）一律無效。必須收回與剩餘牌堆洗勻（不含之前的銷牌），待所有行動完成後重新發出。'
+                },
+                {
+                    category: '盲注規則',
+                    question: '一位玩家在盲注位，但發牌時他剛好去洗手間不在座位上。荷官該怎麼做？',
+                    options: ['不發牌給他', '發牌給他，若輪到他行動時他還沒回來，則視為死牌並扣除盲注', '幫他下盲注，並替他過牌', '等他回來再發牌'],
+                    correctAnswerIndex: 1,
+                    explanation: '不在座位上的玩家依然會被發牌與扣除盲注。若輪到他行動（或發出最後一輪牌）時他仍未回座，其手牌將被直接視為死牌 (Mucked)。'
+                },
+                {
+                    category: '判定規則',
+                    question: '牌面是 A-K-Q-J-10 (皆不同花色)。玩家A底牌 2-3，玩家B底牌 4-5。誰贏？',
+                    options: ['玩家A', '玩家B', '平分底池 (Split Pot)', '莊家贏'],
+                    correctAnswerIndex: 2,
+                    explanation: '公共牌已經是最大的順子（Broadway），兩人底牌都無法組成更大的五張牌。因此兩人皆使用公共牌的五張，平分底池。'
+                },
+                {
+                    category: '流程規則',
+                    question: '洗牌後，荷官忘記讓玩家切牌 (Cut card) 就直接開始發牌。何時會被宣告為誤發 (Misdeal)？',
+                    options: ['發出第一張牌就誤發', '若已經發出兩張以上的牌，通常視為誤發，必須重新洗牌', '整局打完才算', '不影響，繼續打'],
+                    correctAnswerIndex: 1,
+                    explanation: '忘記切牌屬於程序錯誤，若已開始發牌（大於兩張），為確保公平性，應宣告誤發並重新洗牌。'
+                },
+                {
+                    category: '籌碼規則',
+                    question: '玩家將籌碼向前推出越過下注線 (Forward motion)，隨後反悔想收回一半。荷官應如何判決？',
+                    options: ['允許收回', '越過下注線的籌碼必須全部留在池中', '警告一次，允許收回', '判決死牌'],
+                    correctAnswerIndex: 1,
+                    explanation: '向前推進規則 (Forward Motion Rule) 規定，只要籌碼被推進並越過下注線（或有明顯下注動作），就必須留在底池，不允許反悔收回。'
+                },
+                {
+                    category: '發牌與規則',
+                    question: '發出河牌後，發現牌堆裡少了一張牌（整副牌只有51張），這局怎麼算？',
+                    options: ['整局作廢退還籌碼', '只要參與手牌的玩家都拿到完整牌且公共牌發完，該局依然有效。打完後再換新牌', '沒收底池', '重發河牌'],
+                    correctAnswerIndex: 1,
+                    explanation: '若在牌局末期才發現缺牌，只要不影響已發出的玩家底牌和公共牌，該局依然有效並正常結算，隨後必須更換一副新牌。'
+                },
+                {
+                    category: '宣告與動作',
+                    question: '翻牌前，玩家A下注 100分，玩家B丟出一枚 1000分 籌碼並喊「加註(Raise)」，但沒說金額。此時加註金額是多少？',
+                    options: ['加註到 200分', '加註到 1000分', '由玩家B重新決定', '無效動作'],
+                    correctAnswerIndex: 1,
+                    explanation: '若玩家宣告加註，且丟出單一枚超大面額籌碼而沒有宣告特定金額，則加註總額視為該枚籌碼的完整面額（即 1000分）。'
+                }
+            ];
+
+            staticRules.forEach(q => {
+                qList.push({ id: idCounter++, ...q });
+            });
+
+            // 2. 最小加註計算 (Min Raise) - 動態生成 60 題
+            const blindsList = [
+                { sb: 5, bb: 10 }, { sb: 10, bb: 20 }, { sb: 25, bb: 50 }, { sb: 50, bb: 100 }
+            ];
+            for (let i = 0; i < 60; i++) {
+                const blinds = blindsList[Math.floor(Math.random() * blindsList.length)];
+                const bet = blinds.bb * (Math.floor(Math.random() * 4) + 2); // 2-5 BB
+                const raiseAmount = blinds.bb * (Math.floor(Math.random() * 5) + 2);
+                const raiseTotal = bet + raiseAmount;
+                const minReraise = raiseTotal + raiseAmount;
+
+                const correctAns = `${minReraise}分`;
+                const options = [
+                    correctAns,
+                    `${raiseTotal + bet}分`,
+                    `${raiseTotal * 2}分`,
+                    `${minReraise + blinds.bb}分`
+                ];
+                const shuffled = options.sort(() => Math.random() - 0.5);
+
+                qList.push({
+                    id: idCounter++,
+                    category: '最小加註計算 (Min Raise)',
+                    question: `盲注級別 ${blinds.sb}/${blinds.bb}分。翻牌後，玩家A下注 ${bet}分，玩家B加註到總額 ${raiseTotal}分。請問如果玩家C想要再加註（Re-raise），最低的加註總額應該是多少？`,
+                    options: shuffled,
+                    correctAnswerIndex: shuffled.indexOf(correctAns),
+                    explanation: `玩家B加註到 ${raiseTotal}分，相對於玩家A的 ${bet}分，實際加註額為 ${raiseAmount}分。下一位玩家的最小加註總額必須是「目前的總注額加上前一次的加註額」，即 ${raiseTotal}分 + ${raiseAmount}分 = ${minReraise}分。`
+                });
+            }
+
+            // 3. 邊池計算 (Side Pot) - 動態生成 60 題
+            for (let i = 0; i < 60; i++) {
+                const A = (Math.floor(Math.random() * 10) + 1) * 100; 
+                const diff = (Math.floor(Math.random() * 10) + 1) * 100;
+                const B = A + diff;
+                const mainPot = A * 3;
+                const sidePot = diff * 2;
+
+                const correctAns = `主池: ${mainPot}分, 邊池: ${sidePot}分`;
+                const options = [
+                    correctAns,
+                    `主池: ${A * 2}分, 邊池: ${B * 2}分`,
+                    `主池: ${mainPot + sidePot}分, 邊池: 0分`,
+                    `主池: ${mainPot}分, 邊池: ${diff * 3}分`
+                ];
+                const shuffled = options.sort(() => Math.random() - 0.5);
+
+                qList.push({
+                    id: idCounter++,
+                    category: '邊池計算 (Side Pot)',
+                    question: `三人局。玩家A籌碼 ${A}分 全押 (All-in)，玩家B籌碼 ${B}分 也全押，玩家C籌碼最多並宣告跟注 (Call)。請問主池與邊池分別是多少？`,
+                    options: shuffled,
+                    correctAnswerIndex: shuffled.indexOf(correctAns),
+                    explanation: `主池由3人共同承擔最小 All-in 者(A)的金額：${A}分 x 3 = ${mainPot}分。邊池由剩餘2人(B與C)承擔B多出來的金額(${B}分 - ${A}分 = ${diff}分)：${diff}分 x 2 = ${sidePot}分。`
+                });
+            }
+
+            // 4. 單一籌碼規則 (One-Chip Rule) - 動態生成 60 題
+            const chipValues = [500, 1000, 5000, 25000];
+            for (let i = 0; i < 60; i++) {
+                const chip = chipValues[Math.floor(Math.random() * chipValues.length)];
+                const bet = (Math.floor(Math.random() * 8) + 1) * (chip / 10);
+                if (bet >= chip) { i--; continue; } // 保證籌碼大於下注額
+
+                const options = ['跟注 (Call)', '加註 (Raise)', '無效動作', '視為棄牌 (Fold)'];
+                const shuffled = options.sort(() => Math.random() - 0.5);
+                const correctAns = '跟注 (Call)';
+
+                qList.push({
+                    id: idCounter++,
+                    category: '籌碼動作判定',
+                    question: `面對前方玩家 ${bet}分 的下注，輪到某玩家時，他默默丟出一枚面額 ${chip}分 的大籌碼，且「沒有」任何口頭宣告。身為荷官，這代表什麼動作？`,
+                    options: shuffled,
+                    correctAnswerIndex: shuffled.indexOf(correctAns),
+                    explanation: `根據TDA「單一籌碼規則 (One-Chip Rule)」，面對下注時，若丟出一枚面額大於該下注額的單一籌碼且未宣告加註，一律視為「跟注 (Call)」，荷官需找零 ${chip - bet}分。`
+                });
+            }
+
+            return qList;
+        };
+
+        // ==========================================
+        // 系統狀態與邏輯
+        // ==========================================
+        const ALL_QUESTIONS = generateQuestionBank();
+        const QUESTIONS_PER_SESSION = 30;
+
+        let state = {
+            gameState: 'start', // 'start', 'quiz', 'result'
+            sessionQuestions: [],
+            currentIndex: 0,
+            score: 0,
+            selectedOption: null,
+            isSubmitted: false,
+            history: []
+        };
+
+        // 更新畫面
+        function render() {
+            const app = document.getElementById('app');
+            if (state.gameState === 'start') {
+                app.innerHTML = renderStartScreen();
+            } else if (state.gameState === 'quiz') {
+                app.innerHTML = renderQuizScreen();
+            } else if (state.gameState === 'result') {
+                app.innerHTML = renderResultScreen();
+            }
+            // 重新渲染 Lucide Icons
+            lucide.createIcons();
+        }
+
+        // 綁定至 window 以便 HTML 內聯 onclick 呼叫
+        window.startPractice = () => {
+            const shuffled = [...ALL_QUESTIONS].sort(() => 0.5 - Math.random());
+            state.sessionQuestions = shuffled.slice(0, QUESTIONS_PER_SESSION);
+            state.gameState = 'quiz';
+            state.currentIndex = 0;
+            state.score = 0;
+            state.history = [];
+            state.selectedOption = null;
+            state.isSubmitted = false;
+            render();
+        };
+
+        window.setSelectedOption = (idx) => {
+            if (state.isSubmitted) return;
+            state.selectedOption = idx;
+            render();
+        };
+
+        window.handleSubmit = () => {
+            if (state.selectedOption === null) return;
+            
+            const currentQ = state.sessionQuestions[state.currentIndex];
+            const isCorrect = state.selectedOption === currentQ.correctAnswerIndex;
+            
+            if (isCorrect) state.score += 1;
+            
+            state.history.push({
+                question: currentQ.question,
+                category: currentQ.category,
+                userAnswer: currentQ.options[state.selectedOption],
+                correctAnswer: currentQ.options[currentQ.correctAnswerIndex],
+                explanation: currentQ.explanation,
+                isCorrect: isCorrect
+            });
+            
+            state.isSubmitted = true;
+            render();
+        };
+
+        window.handleNext = () => {
+            if (state.currentIndex < QUESTIONS_PER_SESSION - 1) {
+                state.currentIndex += 1;
+                state.selectedOption = null;
+                state.isSubmitted = false;
+            } else {
+                state.gameState = 'result';
+            }
+            render();
+        };
+
+        // ==========================================
+        // 畫面渲染函數
+        // ==========================================
+        function renderStartScreen() {
+            return `
+                <div class="flex flex-col items-center justify-center min-h-[500px] text-center space-y-8 animate-fade-in">
+                    <div class="bg-emerald-900/40 p-6 rounded-full border-4 border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                        <i data-lucide="trophy" class="text-yellow-400 w-16 h-16"></i>
+                    </div>
+                    <div class="space-y-4 max-w-xl">
+                        <h1 class="text-4xl font-bold text-emerald-400 drop-shadow-md">德州撲克荷官 (Dealer) 專業認證</h1>
+                        <p class="text-slate-300 text-lg">
+                            本系統內建 200 題國際標準 (TDA) 專業題庫。涵蓋流程判斷、盲注規則、邊池計算與最小加註額速算。<br/><br/>
+                            每次隨機抽選 <span class="font-bold text-yellow-400 text-xl">${QUESTIONS_PER_SESSION}</span> 題進行測驗。準備好挑戰您的荷官專業度了嗎？
+                        </p>
+                    </div>
+                    <button 
+                        onclick="startPractice()"
+                        class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-full text-xl font-bold transition-all transform hover:scale-105 shadow-lg"
+                    >
+                        <i data-lucide="play" class="fill-current w-6 h-6"></i>
+                        開始專業測驗
+                    </button>
+                    <div class="text-emerald-700 font-mono text-sm">Question Bank: ${ALL_QUESTIONS.length} Questions Loaded</div>
+                </div>
+            `;
+        }
+
+        function renderQuizScreen() {
+            const q = state.sessionQuestions[state.currentIndex];
+            
+            const optionsHtml = q.options.map((opt, idx) => {
+                let btnStyle = "bg-slate-700/50 border-slate-600 hover:bg-slate-700 hover:border-slate-500 text-slate-200 cursor-pointer";
+                let iconHtml = "";
+                
+                if (state.isSubmitted) {
+                    btnStyle = "bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-default";
+                    if (idx === q.correctAnswerIndex) {
+                        btnStyle = "bg-green-900/40 border-green-500 text-green-300 cursor-default"; 
+                        iconHtml = `<i data-lucide="check-circle-2" class="text-green-500"></i>`;
+                    } else if (idx === state.selectedOption) {
+                        btnStyle = "bg-red-900/40 border-red-500 text-red-300 cursor-default"; 
+                        iconHtml = `<i data-lucide="x-circle" class="text-red-500"></i>`;
+                    }
+                } else if (state.selectedOption === idx) {
+                    btnStyle = "bg-emerald-900/50 border-emerald-500 text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.2)]"; 
+                }
+
+                return `
+                    <button
+                        ${state.isSubmitted ? 'disabled' : ''}
+                        onclick="setSelectedOption(${idx})"
+                        class="w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between ${btnStyle}"
+                    >
+                        <span class="text-lg">${opt}</span>
+                        ${iconHtml}
+                    </button>
+                `;
+            }).join('');
+
+            let feedbackHtml = '';
+            if (!state.isSubmitted) {
+                const btnClass = state.selectedOption !== null 
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg cursor-pointer' 
+                    : 'bg-slate-700 text-slate-500 cursor-not-allowed';
+                
+                feedbackHtml = `
+                    <button
+                        onclick="handleSubmit()"
+                        ${state.selectedOption === null ? 'disabled' : ''}
+                        class="w-full py-4 rounded-xl text-xl font-bold transition-all ${btnClass}"
+                    >
+                        確認送出
+                    </button>
+                `;
+            } else {
+                const isCorrect = state.selectedOption === q.correctAnswerIndex;
+                const alertStyle = isCorrect ? 'bg-green-900/20 border-green-500/50' : 'bg-red-900/20 border-red-500/50';
+                const titleColor = isCorrect ? 'text-green-400' : 'text-red-400';
+                const titleText = isCorrect ? '正確！' : '錯誤！';
+                const iconHtml = isCorrect 
+                    ? `<i data-lucide="check-circle-2" class="text-green-400"></i>` 
+                    : `<i data-lucide="alert-triangle" class="text-red-400"></i>`;
+                const btnText = state.currentIndex < QUESTIONS_PER_SESSION - 1 ? '下一題' : '查看結算成績';
+
+                feedbackHtml = `
+                    <div class="space-y-4 animate-fade-in">
+                        <div class="p-5 rounded-xl border ${alertStyle}">
+                            <div class="flex items-center gap-2 mb-2">
+                                ${iconHtml}
+                                <h3 class="font-bold text-lg ${titleColor}">${titleText}</h3>
+                            </div>
+                            <p class="text-slate-300 leading-relaxed">${q.explanation}</p>
+                        </div>
+                        <button
+                            onclick="handleNext()"
+                            class="w-full flex items-center justify-center gap-2 bg-yellow-600 hover:bg-yellow-500 text-white py-4 rounded-xl text-xl font-bold transition-all shadow-lg"
+                        >
+                            ${btnText}
+                            <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="max-w-3xl mx-auto w-full flex flex-col space-y-6 animate-fade-in">
+                    <!-- Progress Header -->
+                    <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm">
+                        <div class="space-y-1">
+                            <span class="text-sm text-slate-400 font-semibold uppercase tracking-wider">Progress</span>
+                            <div class="text-xl font-bold text-emerald-400">
+                                Question ${state.currentIndex + 1} <span class="text-slate-500">/ ${QUESTIONS_PER_SESSION}</span>
+                            </div>
+                        </div>
+                        <div class="space-y-1 text-right">
+                            <span class="text-sm text-slate-400 font-semibold uppercase tracking-wider">Score</span>
+                            <div class="text-xl font-bold text-yellow-400">${state.score}</div>
+                        </div>
+                    </div>
+
+                    <!-- Question Card -->
+                    <div class="bg-slate-800 border border-slate-700 p-6 md:p-8 rounded-2xl shadow-xl space-y-6">
+                        <span class="inline-block px-3 py-1 bg-emerald-900/50 text-emerald-300 text-sm font-bold rounded-lg border border-emerald-800/50">
+                            ${q.category}
+                        </span>
+                        <h2 class="text-2xl font-medium text-slate-100 leading-relaxed">
+                            ${q.question}
+                        </h2>
+
+                        <div class="space-y-3 pt-4">
+                            ${optionsHtml}
+                        </div>
+                    </div>
+
+                    <!-- Feedback & Actions -->
+                    <div class="min-h-[120px]">
+                        ${feedbackHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderResultScreen() {
+            const percentage = Math.round((state.score / QUESTIONS_PER_SESSION) * 100);
+            let feedbackMsg = "";
+            let feedbackColor = "";
+            
+            if (percentage >= 90) { feedbackMsg = "卓越！具備國際賽事級別專業荷官水準！"; feedbackColor = "text-yellow-400"; }
+            else if (percentage >= 75) { feedbackMsg = "優秀！對規則有很好的掌握，稍加練習即可上桌。"; feedbackColor = "text-emerald-400"; }
+            else if (percentage >= 60) { feedbackMsg = "及格！基本概念有，但在計算與特殊規則上需多加複習。"; feedbackColor = "text-orange-400"; }
+            else { feedbackMsg = "需加強！建議重新熟讀 TDA 規則及底池計算方式。"; feedbackColor = "text-red-400"; }
+
+            const wrongAnswers = state.history.filter(h => !h.isCorrect);
+            let wrongAnswersHtml = '';
+
+            if (wrongAnswers.length > 0) {
+                const listHtml = wrongAnswers.map(item => `
+                    <div class="bg-slate-800/80 border border-red-900/50 p-6 rounded-xl space-y-3">
+                        <span class="text-xs font-bold text-red-400 uppercase tracking-wider bg-red-900/30 px-2 py-1 rounded">${item.category}</span>
+                        <p class="text-lg text-slate-200 font-medium">${item.question}</p>
+                        <div class="bg-slate-900/50 p-4 rounded-lg space-y-2 text-sm">
+                            <div class="flex items-start gap-2">
+                                <i data-lucide="x-circle" class="text-red-500 shrink-0 mt-0.5 w-5 h-5"></i>
+                                <span class="text-slate-400">你的答案：<span class="text-red-300 line-through">${item.userAnswer}</span></span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <i data-lucide="check-circle-2" class="text-green-500 shrink-0 mt-0.5 w-5 h-5"></i>
+                                <span class="text-slate-400">正確答案：<span class="text-green-400 font-bold">${item.correctAnswer}</span></span>
+                            </div>
+                        </div>
+                        <div class="text-slate-300 text-sm bg-slate-700/30 p-4 rounded-lg border-l-4 border-emerald-500">
+                            <span class="font-bold text-emerald-400 block mb-1">解析說明：</span>
+                            ${item.explanation}
+                        </div>
+                    </div>
+                `).join('');
+
+                wrongAnswersHtml = `
+                    <div class="space-y-4">
+                        <h3 class="text-2xl font-bold text-slate-200 border-b border-slate-700 pb-2">錯誤題目檢討</h3>
+                        ${listHtml}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="max-w-4xl mx-auto w-full space-y-8 animate-fade-in">
+                    <div class="bg-slate-800 border border-slate-700 p-8 rounded-2xl shadow-xl text-center space-y-6">
+                        <h2 class="text-3xl font-bold text-slate-200">測驗結算報告</h2>
+                        
+                        <div class="flex justify-center py-6">
+                            <div class="relative w-48 h-48 rounded-full border-8 border-slate-700 flex flex-col items-center justify-center bg-slate-900 shadow-inner">
+                                <span class="text-5xl font-black ${feedbackColor}">${percentage}%</span>
+                                <span class="text-slate-400 mt-2 font-semibold">${state.score} / ${QUESTIONS_PER_SESSION} 答對</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-xl font-bold ${feedbackColor}">${feedbackMsg}</p>
+                        
+                        <button
+                            onclick="startPractice()"
+                            class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg mx-auto"
+                        >
+                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                            重新挑戰 (隨機新題)
+                        </button>
+                    </div>
+
+                    ${wrongAnswersHtml}
+                </div>
+            `;
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            render();
+        });
+    </script>
+</body>
+</html>
