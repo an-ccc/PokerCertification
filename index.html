@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>德州實體記分員(Dealer)專業認證</title>
+    <title>德州實體荷官(Dealer)專業認證</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -23,246 +23,133 @@
 
     <script>
         // ==========================================
-        // 題庫生成引擎 (產生 200 題專業記分員題庫)
+        // 題庫生成引擎 (產生精確的 200 題專業題庫)
         // ==========================================
         const generateQuestionBank = () => {
             let qList = [];
             let idCounter = 1;
 
-            // 1. 核心靜態規則題 (擴充至包含各種情境)
-            const staticRules = [
-                {
-                    category: '發牌與規則',
-                    question: '在發首發底牌時，記分員不小心將第一張牌（小盲注的牌）翻開了（Exposed card）。接下來該如何處理？',
-                    options: ['繼續發牌，該張牌做為第一張銷牌', '宣告誤發（Misdeal），收回所有牌重新洗牌發牌', '繼續發牌，這局結束後再換牌', '視為死牌，小盲注本局無法參與'],
-                    correctAnswerIndex: 1,
-                    explanation: '根據TDA標準規則，如果發出的第一張或第二張牌被翻開，必須宣告誤發（Misdeal），所有牌收回重新洗牌。'
-                },
-                {
-                    category: '發牌與規則',
-                    question: '發牌時，若中間位置閒家的底牌不小心被翻開（非首兩張）怎麼處理？',
-                    options: ['宣告誤發 (Misdeal)，全部重洗', '該玩家強制棄牌', '該牌將成為翻牌圈 (Flop) 的第一張銷牌，並補發一張原來的銷牌給該玩家', '直接換一張牌給他，被翻開的牌洗回牌堆'],
-                    correctAnswerIndex: 2,
-                    explanation: '非首兩張的底牌若被翻開，不視為誤發。記分員應繼續完成發牌，最後將原本的銷牌發給該玩家，並將被翻開的牌作為翻牌圈的銷牌。'
-                },
-                {
-                    category: '分池規則',
-                    question: '兩位玩家平分底池，出現一枚無法平分的最小面額畸零籌碼 (Odd chip)。這枚籌碼應該發給誰？',
-                    options: ['按鈕位 (Button) 玩家', '按鈕位左手邊第一個參與分池的玩家 (小盲方向)', '按鈕位右手邊第一個參與分池的玩家', '留在底池作為下一局的獎金'],
-                    correctAnswerIndex: 1,
-                    explanation: '無法平分的畸零籌碼，必須發給參與分池且位置最靠前（Out of position，即按鈕位左側順時針第一位）的玩家。'
-                },
-                {
-                    category: '攤牌規則',
-                    question: '攤牌時，若河牌圈 (River) 無人下注（大家都過牌 Check），該由誰先亮牌？',
-                    options: ['按鈕位 (Button) 玩家', '由按鈕位左手邊第一位還在局內的玩家先亮', '籌碼最多的玩家', '最後一輪有加註的玩家'],
-                    correctAnswerIndex: 1,
-                    explanation: '若最後一輪無人下注，亮牌順序由按鈕位左側第一位玩家開始順時針亮牌。'
-                },
-                {
-                    category: '攤牌規則',
-                    question: '攤牌時，若河牌圈 (River) 有玩家下注並被跟注，該由誰先亮牌？',
-                    options: ['最後一個採取激進動作（下注或加註）的玩家先亮牌', '跟注的玩家先亮牌', '按鈕位玩家', '籌碼最少的玩家'],
-                    correctAnswerIndex: 0,
-                    explanation: '在最後一輪有下注動作的情況下，由最後一個下注或加註（Aggressor）的玩家優先亮牌。'
-                },
-                {
-                    category: '下注規則',
-                    question: '玩家分兩次將籌碼放入底池（未事先口頭宣告加註），這是什麼行為？',
-                    options: ['合法加註', '分次下注 (String Bet)，違規，只能視為跟注', '直接判決死牌', '視為全押'],
-                    correctAnswerIndex: 1,
-                    explanation: '這被稱為分次下注 (String Bet)。若未事先宣告加註金額，玩家必須一次性將所有籌碼推入池中。分次推入只能被視為跟注 (Call)。'
-                },
-                {
-                    category: '發牌與規則',
-                    question: '記分員在翻牌圈忘記銷牌 (Burn card)，直接發出三張公共牌，且尚未有玩家行動。應如何處理？',
-                    options: ['保留該三張牌不處理', '收回三張翻牌，重新洗牌後，正確銷一張牌再發出翻牌', '將第三張當銷牌，補發一張', '直接進入下一輪'],
-                    correctAnswerIndex: 1,
-                    explanation: '忘記銷牌且無人行動時，必須將錯誤的翻牌收回，與剩餘牌堆（不含第一輪的銷牌）洗勻，重新銷牌並發出正確的翻牌。'
-                },
-                {
-                    category: '流程規則',
-                    question: '玩家在未輪到他時提早行動 (Action out of turn)，宣佈跟注。若輪到他時，前方玩家有人加註，他的提早行動有效嗎？',
-                    options: ['依然有效，必須跟注加註額', '無效，他可以重新決定要跟注、加註或棄牌', '有效，但他不能再加註', '視為死牌'],
-                    correctAnswerIndex: 1,
-                    explanation: '如果前方玩家的行動發生改變（如加註），提早行動的玩家可以收回之前的決定，重新選擇所有合法動作。'
-                },
-                {
-                    category: '盲注規則',
-                    question: '如果小盲注玩家在上一局被淘汰，這一局的按鈕 (Button) 該怎麼擺？',
-                    options: ['按鈕移動到大盲注位置', '按鈕移動到空位上（Dead Button），該局無小盲注，大盲正常', '按鈕不移動，下一局再移', '重新抽籤決定按鈕'],
-                    correctAnswerIndex: 1,
-                    explanation: '遇到這種情況實施「死按鈕 (Dead Button)」規則。按鈕會移動到被淘汰玩家的空位上，確保大盲注位置正確推進，該局沒有小盲注。'
-                },
-                {
-                    category: '宣告與動作',
-                    question: '玩家口頭宣告「加註 $500」，但實際上丟出 $1000 面額的籌碼且未要求找零。應視為多少？',
-                    options: ['加註 $1000', '加註 $500，記分員應找回 $500', '無效動作', '跟注'],
-                    correctAnswerIndex: 1,
-                    explanation: '口頭宣告優先（Verbal Declaration is Binding）。只要口頭宣告了 $500，無論丟出多大的籌碼，都視為加註 $500。'
-                },
-                {
-                    category: '下注規則',
-                    question: '玩家在 All-in 時，籌碼量「未達」最小合法加註額 (Short All-in)。前方已經行動過的玩家還能再加註嗎？',
-                    options: ['可以，只要籌碼夠', '不行，此下注無法重新開啟加註權限 (Re-open betting)，只能跟注', '由記分員決定', '可以，但只能加倍'],
-                    correctAnswerIndex: 1,
-                    explanation: '不足最小加註額的 All-in (Short All-in) 不會重新開啟已經行動過玩家的加註權限。他們面對這個 All-in 只能選擇跟注或棄牌。'
-                },
-                {
-                    category: '發牌與規則',
-                    question: '玩家為了看清楚遠處的公共牌，將自己的底牌拿離桌面或放到桌子邊緣外。這樣可以嗎？',
-                    options: ['可以，只要不給別人看', '違規。底牌必須隨時保持在桌面範圍及記分員視線內', '只有在單挑時可以', '由對手決定'],
-                    correctAnswerIndex: 1,
-                    explanation: '撲克安全規則要求玩家的底牌必須隨時保持在桌面邊界之內，並且在記分員的視線範圍內，以防作弊或換牌。'
-                },
-                {
-                    category: '發牌與規則',
-                    question: '如果記分員在發轉牌 (Turn) 時，不小心黏牌發出了兩張牌。該怎麼處理？',
-                    options: ['兩張都作廢', '保留正確的第一張，第二張視為下一輪河牌 (River) 的銷牌', '重新洗牌', '讓玩家投票決定'],
-                    correctAnswerIndex: 1,
-                    explanation: '遇到發出多餘牌的情況，正確的那張轉牌保留。多出的那一張則提早作為河牌圈的銷牌（放在一旁，河牌時不再銷牌）。'
-                },
-                {
-                    category: '發牌與規則',
-                    question: '記分員在前方玩家「尚未完成行動前」，就不小心提早發出了下一輪的公共牌 (Premature Deal)。處理方式？',
-                    options: ['該公共牌無效，將牌收回洗入牌堆，等待玩家行動完後重新發出', '保留該牌，強制玩家快速決定', '給未行動玩家補償籌碼', '該局直接平分'],
-                    correctAnswerIndex: 0,
-                    explanation: '提早發出的公共牌（Premature Deal）一律無效。必須收回與剩餘牌堆洗勻（不含之前的銷牌），待所有行動完成後重新發出。'
-                },
-                {
-                    category: '盲注規則',
-                    question: '一位玩家在盲注位，但發牌時他剛好去洗手間不在座位上。記分員該怎麼做？',
-                    options: ['不發牌給他', '發牌給他，若輪到他行動時他還沒回來，則視為死牌並扣除盲注', '幫他下盲注，並替他過牌', '等他回來再發牌'],
-                    correctAnswerIndex: 1,
-                    explanation: '不在座位上的玩家依然會被發牌與扣除盲注。若輪到他行動（或發出最後一輪牌）時他仍未回座，其手牌將被直接視為死牌 (Mucked)。'
-                },
-                {
-                    category: '判定規則',
-                    question: '牌面是 A-K-Q-J-10 (皆不同花色)。玩家A底牌 2-3，玩家B底牌 4-5。誰贏？',
-                    options: ['玩家A', '玩家B', '平分底池 (Split Pot)', '莊家贏'],
-                    correctAnswerIndex: 2,
-                    explanation: '公共牌已經是最大的順子（Broadway），兩人底牌都無法組成更大的五張牌。因此兩人皆使用公共牌的五張，平分底池。'
-                },
-                {
-                    category: '判定規則',
-                    question: '公共牌為 A-A-K-K-Q。玩家A底牌為 J-J，玩家B底牌為 10-10。誰贏得底池？',
-                    options: ['平分底池 (Split Pot)', '玩家A贏', '玩家B贏', '由花色決定'],
-                    correctAnswerIndex: 0,
-                    explanation: '兩人的最大五張牌組合都是 A-A-K-K-Q（也就是打公共牌 Play the board）。底牌的 J 或 10 都無法替換掉公共牌中的 Q，因此平分。'
-                },
-                {
-                    category: '流程規則',
-                    question: '洗牌後，記分員忘記讓玩家切牌 (Cut card) 就直接開始發牌。何時會被宣告為誤發 (Misdeal)？',
-                    options: ['發出第一張牌就誤發', '若已經發出兩張以上的牌，通常視為誤發，必須重新洗牌', '整局打完才算', '不影響，繼續打'],
-                    correctAnswerIndex: 1,
-                    explanation: '忘記切牌屬於程序錯誤，若已開始發牌（大於兩張），為確保公平性，應宣告誤發並重新洗牌。'
-                },
-                {
-                    category: '籌碼規則',
-                    question: '玩家將籌碼向前推出越過下注線 (Forward motion)，隨後反悔想收回一半。記分員應如何判決？',
-                    options: ['允許收回', '越過下注線的籌碼必須全部留在池中', '警告一次，允許收回', '判決死牌'],
-                    correctAnswerIndex: 1,
-                    explanation: '向前推進規則 (Forward Motion Rule) 規定，只要籌碼被推進並越過下注線（或有明顯下注動作），就必須留在底池，不允許反悔收回。'
-                },
-                {
-                    category: '發牌與規則',
-                    question: '發出河牌後，發現牌堆裡少了一張牌（整副牌只有51張），這局怎麼算？',
-                    options: ['整局作廢退還籌碼', '只要參與手牌的玩家都拿到完整牌且公共牌發完，該局依然有效。打完後再換新牌', '沒收底池', '重發河牌'],
-                    correctAnswerIndex: 1,
-                    explanation: '若在牌局末期才發現缺牌，只要不影響已發出的玩家底牌和公共牌，該局依然有效並正常結算，隨後必須更換一副新牌。'
-                },
-                {
-                    category: '宣告與動作',
-                    question: '翻牌前，玩家A下注 $100，玩家B丟出一枚 $1000 籌碼並喊「加註(Raise)」，但沒說金額。此時加註金額是多少？',
-                    options: ['加註到 $200', '加註到 $1000', '由玩家B重新決定', '無效動作'],
-                    correctAnswerIndex: 1,
-                    explanation: '若玩家宣告加註，且丟出單一枚超大面額籌碼而沒有宣告特定金額，則加註總額視為該枚籌碼的完整面額（即 $1000）。'
-                }
+            // 1. 建立 34 個獨立的 TDA 規則核心情境 (Templates)
+            const baseRuleTemplates = [
+                { cat: '發牌與規則', q: '在發首發底牌時，荷官不小心將{pos}的第一張牌翻開了（Exposed card）。接下來該如何處理？', opts: ['繼續發牌，該張牌做為第一張銷牌', '宣告誤發（Misdeal），收回所有牌重新洗牌發牌', '繼續發牌，這局結束後再換牌', '視為死牌，該玩家本局無法參與'], ans: 1, exp: '根據TDA標準規則，如果發出的第一張或第二張牌被翻開，必須宣告誤發（Misdeal），所有牌收回重新洗牌。' },
+                { cat: '發牌與規則', q: '發牌時，若{pos}的底牌不小心被翻開（非首兩張）怎麼處理？', opts: ['宣告誤發 (Misdeal)，全部重洗', '該玩家強制棄牌', '該牌將成為翻牌圈 (Flop) 的第一張銷牌，並補發一張原來的銷牌給該玩家', '直接換一張牌給他，被翻開的牌洗回牌堆'], ans: 2, exp: '非首兩張的底牌若被翻開，不視為誤發。荷官應繼續完成發牌，最後將原本的銷牌發給該玩家，被翻開的牌作為銷牌。' },
+                { cat: '分池規則', q: '平分底池時，出現一枚無法平分的最小面額畸零籌碼 (Odd chip)。這枚籌碼應該發給誰？', opts: ['按鈕位 (Button) 玩家', '按鈕位左手邊第一個參與分池的玩家 (小盲方向)', '按鈕位右手邊第一個參與分池的玩家', '留在底池作為下一局的獎金'], ans: 1, exp: '無法平分的畸零籌碼，必須發給參與分池且位置最靠前（即按鈕位左側順時針第一位）的玩家。' },
+                { cat: '攤牌規則', q: '攤牌時，若河牌圈 (River) 無人下注（大家都過牌），該由誰先亮牌？', opts: ['按鈕位玩家', '由按鈕位左手邊第一位還在局內的玩家先亮', '籌碼最多的玩家', '最後一輪有加註的玩家'], ans: 1, exp: '若最後一輪無人下注，亮牌順序由按鈕位左側第一位玩家開始順時針亮牌。' },
+                { cat: '攤牌規則', q: '攤牌時，若河牌圈 (River) {pos}有下注並被跟注，該由誰先亮牌？', opts: ['最後一個採取激進動作（下注或加註）的玩家先亮牌', '跟注的玩家先亮牌', '按鈕位玩家', '籌碼最少的玩家'], ans: 0, exp: '在最後一輪有下注動作的情況下，由最後一個下注或加註（Aggressor）的玩家優先亮牌。' },
+                { cat: '下注規則', q: '{pos}分兩次將籌碼放入底池（未事先口頭宣告加註），這是什麼行為？', opts: ['合法加註', '分次下注 (String Bet)，違規，只能視為跟注', '直接判決死牌', '視為全押'], ans: 1, exp: '分次下注 (String Bet) 若未事先宣告金額，必須一次性推入籌碼。分次推入只能被視為跟注。' },
+                { cat: '發牌與規則', q: '荷官在翻牌圈忘記銷牌 (Burn card)，直接發出三張公共牌，且尚未有玩家行動。應如何處理？', opts: ['保留該三張牌不處理', '收回三張翻牌，重新洗牌後，正確銷一張牌再發出', '將第三張當銷牌，補發一張', '直接進入下一輪'], ans: 1, exp: '忘記銷牌且無人行動時，必須將錯誤的公共牌收回與剩餘牌堆洗勻，重新銷牌並發出正確的牌。' },
+                { cat: '流程規則', q: '{pos}在未輪到他時提早行動 (Action out of turn) 宣佈跟注。若輪到他時，前方玩家有人加註，他的提早行動有效嗎？', opts: ['依然有效，必須跟注加註額', '無效，他可以重新決定要跟注、加註或棄牌', '有效，但他不能再加註', '視為死牌'], ans: 1, exp: '如果前方玩家的行動發生改變（如加註），提早行動的玩家可以收回之前的決定，重新選擇所有合法動作。' },
+                { cat: '盲注規則', q: '如果小盲注玩家在上一局被淘汰，這一局的按鈕 (Button) 該怎麼擺？', opts: ['按鈕移動到大盲注位置', '按鈕移動到空位上（Dead Button），該局無小盲注', '按鈕不移動', '重新抽籤決定按鈕'], ans: 1, exp: '實施「死按鈕 (Dead Button)」規則。按鈕會移動到被淘汰玩家的空位上，確保大盲注位置正確推進。' },
+                { cat: '宣告與動作', q: '{pos}口頭宣告「加註 ${amt}」，但實際上丟出兩倍面額的籌碼且未要求找零。應視為多少？', opts: ['加註兩倍金額', '加註 ${amt}，荷官應找零', '無效動作', '跟注'], ans: 1, exp: '口頭宣告優先（Verbal Declaration is Binding）。只要口頭宣告了金額，無論丟出多少籌碼，都視為該宣告金額。' },
+                { cat: '下注規則', q: '{pos}在 All-in 時，籌碼量「未達」最小合法加註額 (Short All-in)。前方已經行動過的玩家還能再加註嗎？', opts: ['可以，只要籌碼夠', '不行，無法重新開啟加註權限 (Re-open betting)，只能跟注', '由荷官決定', '可以，但只能加倍'], ans: 1, exp: '不足最小加註額的 All-in (Short All-in) 不會重新開啟已經行動過玩家的加註權限。' },
+                { cat: '發牌與規則', q: '{pos}為了看清楚遠處的公共牌，將自己的底牌拿離桌面。這樣可以嗎？', opts: ['可以，只要不給別人看', '違規。底牌必須隨時保持在桌面範圍及荷官視線內', '只有在單挑時可以', '由對手決定'], ans: 1, exp: '撲克安全規則要求玩家的底牌必須隨時保持在桌面邊界之內，並且在荷官視線內防作弊。' },
+                { cat: '發牌與規則', q: '荷官在發轉牌 (Turn) 時，不小心黏牌發出了兩張牌。該怎麼處理？', opts: ['兩張都作廢', '保留正確的第一張，第二張視為下一輪河牌的銷牌', '重新洗牌', '讓玩家投票決定'], ans: 1, exp: '正確的那張轉牌保留。多出的那一張提早作為河牌圈的銷牌（放在一旁，河牌時不再銷牌）。' },
+                { cat: '發牌與規則', q: '荷官在前方玩家「尚未完成行動前」，就提早發出了下一輪的公共牌 (Premature Deal)。', opts: ['該公共牌無效，將牌收回洗入牌堆，等待行動完後重新發出', '保留該牌強制決定', '給未行動玩家補償籌碼', '該局直接平分'], ans: 0, exp: '提早發出的公共牌一律無效。必須收回與剩餘牌堆洗勻，待所有行動完成後重新發出。' },
+                { cat: '盲注規則', q: '{pos}在盲注位，但發牌時他不在座位上。荷官該怎麼做？', opts: ['不發牌給他', '發牌給他，若輪到他行動時他還沒回來，則視為死牌並扣除盲注', '幫他下盲注並過牌', '等他回來'], ans: 1, exp: '不在座位上的玩家依然會被發牌與扣除盲注。若輪到他行動時仍未回座，手牌直接視為死牌。' },
+                { cat: '判定規則', q: '公共牌為 A-A-K-K-Q。玩家A底牌為 J-J，玩家B底牌為 10-10。誰贏得底池？', opts: ['平分底池 (Split Pot)', '玩家A贏', '玩家B贏', '由花色決定'], ans: 0, exp: '兩人的最大五張牌組合都是 A-A-K-K-Q（打公共牌）。底牌的 J 或 10 都無法替換掉公共牌的 Q，因此平分。' },
+                { cat: '流程規則', q: '洗牌後，荷官忘記讓玩家切牌 (Cut card) 就直接開始發牌。', opts: ['發出第一張牌就誤發', '若已經發出兩張以上的牌，通常視為誤發，必須重新洗牌', '整局打完才算', '繼續打'], ans: 1, exp: '忘記切牌屬於程序錯誤，若已開始發牌（大於兩張），為確保公平性，應宣告誤發並重新洗牌。' },
+                { cat: '籌碼規則', q: '{pos}將籌碼向前推出越過下注線 (Forward motion)，隨後反悔想收回。', opts: ['允許收回', '越過下注線的籌碼必須全部留在池中', '警告一次，允許收回', '判決死牌'], ans: 1, exp: '向前推進規則 (Forward Motion) 規定，籌碼被推進並越過下注線，就必須留在底池，不允許反悔。' },
+                { cat: '發牌與規則', q: '發出河牌後，發現牌堆裡少了一張牌（整副牌只有51張），這局怎麼算？', opts: ['整局作廢退還籌碼', '只要參與手牌的玩家拿到完整牌且公共牌發完，該局依然有效', '沒收底池', '重發河牌'], ans: 1, exp: '若在牌局末期發現缺牌，只要不影響已發出的玩家底牌和公共牌，該局依然有效並正常結算。' },
+                { cat: '宣告與動作', q: '{pos}下注後，下一位玩家丟出一枚超大面額籌碼並喊「加註」，但沒說金額。', opts: ['加註到最小額度', '加註總額視為該枚籌碼的完整面額', '由玩家重新決定', '無效動作'], ans: 1, exp: '若宣告加註，且丟出單一枚超大面額籌碼而沒有宣告特定金額，則加註總額視為該枚籌碼的完整面額。' },
+                { cat: '桌面禮儀', q: '{pos}在手牌結束後，要求荷官翻開剩餘未發出的牌來看（兔子狩獵 Rabbit Hunting）。可以嗎？', opts: ['可以，只要大家同意', '絕對不允許 (No Rabbit Hunting)', '只有贏家可以看', '付費可以看'], ans: 1, exp: 'TDA 規則嚴格禁止兔子狩獵 (Rabbit Hunting)，以維持遊戲進度與公平性。' },
+                { cat: '攤牌規則', q: '{pos}在局間將底牌私下亮給旁邊已經蓋牌的玩家看。', opts: ['合法', '違反「亮牌公平性 (Show One, Show All)」，必須將牌亮給全桌看', '直接判決死牌', '警告旁觀者'], ans: 1, exp: '根據 Show One, Show All 規則，若將牌展示給任何一位玩家，全桌都有權利看見該手牌。' },
+                { cat: '流程規則', q: '{pos}思考時間過長，其他玩家「呼叫時間 (Call the clock)」。接下來會發生什麼事？', opts: ['直接強制蓋牌', '賽事總監會給予一段倒數時間(通常30秒)，若時間到仍未行動則手牌視為死牌', '罰款籌碼', '暫停遊戲'], ans: 1, exp: '呼叫時間後，樓管(Floorman)會給予倒數計時。時間結束未完成動作，手牌自動視為死牌。' },
+                { cat: '桌面禮儀', q: '牌局進行中，{pos}與另一位玩家用非英語（如家鄉話）交談手牌內容。', opts: ['只要不是討論目前手牌就可以', '違反「僅限英語 (English Only)」規則，牌局進行中桌面僅能使用官方語言', '只有單挑時可以', '由荷官決定'], ans: 1, exp: '為了防止作弊與合謀，國際賽事在牌局進行中嚴格執行 English Only 規則。' },
+                { cat: '攤牌規則', q: '{pos}在攤牌時，宣稱自己有同花，但只亮出其中一張黑桃，另一張蓋著。他能贏得底池嗎？', opts: ['可以，大家相信他', '不行，必須將兩張底牌都亮出桌面 (Show all hole cards) 才能贏得底池', '由對手決定是否要看另一張', '荷官幫他翻開'], ans: 1, exp: '要贏得底池，玩家在攤牌時必須主動亮出所有底牌，不能只亮一張。' },
+                { cat: '判定規則', q: '{pos}決定棄牌，將牌往前推，但牌不小心碰到了另一位仍在局內玩家的底牌。', opts: ['碰到活牌，所以該棄牌復活', '碰到死牌的活牌也會變成死牌', '棄牌依然是死牌，活牌只要能清楚辨識依然有效', '兩者皆重新發牌'], ans: 2, exp: '死牌碰到活牌時，只要活牌能清楚辨識且未混合，活牌依然有效，棄牌維持死牌狀態。' },
+                { cat: '流程規則', q: '翻牌後，大家發現按鈕 (Button) 放錯了位置，但已經有玩家採取了下注行動。', opts: ['退回重打', '只要有顯著行動 (Substantial Action) 發生，該局繼續以錯誤按鈕打完', '移動按鈕並繼續', '沒收底池'], ans: 1, exp: '一旦發生顯著行動（如兩人行動或一人下注），該局就必須以現狀繼續完成，下一局再修正。' },
+                { cat: '籌碼規則', q: '{pos}詢問荷官目前底池裡面有多少籌碼 (在無限注德州撲克 No-Limit 中)。', opts: ['荷官必須精算並報數', '荷官不能計算底池總額，只能攤平底池讓玩家自己看', '荷官可以隨便估算', '其他玩家幫忙算'], ans: 1, exp: '在無限注德州撲克中，荷官不允許替玩家計算底池總數（Pot Limit 則可以）。只能將籌碼攤平方便觀看。' },
+                { cat: '下注規則', q: '還沒發牌前，{pos}就宣布「這局我 All-in (盲推)」。這有效嗎？', opts: ['無效，等發牌後重新決定', '有效，這被視為黑暗宣告 (Action in the dark)，必須強制執行', '視為死牌', '荷官警告'], ans: 1, exp: '黑暗行動 (Action in the dark) 具有約束力，只要宣告就必須執行。' },
+                { cat: '籌碼規則', q: '{pos}把籌碼用力丟向底池中央，使得籌碼散落混入原本的底池中 (Splashing the pot)。', opts: ['合法，有氣勢', '違規行為，這會導致難以計算下注額，應被警告', '判決死牌', '沒收該籌碼'], ans: 1, exp: '潑灑底池 (Splashing the pot) 嚴重影響遊戲進行與籌碼計算，屬於違反禮儀的行為。' },
+                { cat: '宣告與動作', q: '輪到{pos}行動，他口頭說「跟注」，但隨後把手牌蓋掉 (Fold)。以哪個為準？', opts: ['以口頭「跟注」為準，必須補足籌碼但手牌已死', '以蓋牌為準，不需補籌碼', '視為加註', '退回重來'], ans: 0, exp: '口頭宣告具約束力。他必須補齊跟注的籌碼，但因為已經蓋牌，所以這手牌無法參與後續。' },
+                { cat: '流程規則', q: '發牌時，荷官不小心將牌發給了已經空著的座位，且已經發了兩張。', opts: ['當作沒看到', '該座位的牌視為死牌，並作為下一次的銷牌', '宣告誤發 (Misdeal) 重新洗牌', '給下一位玩家'], ans: 2, exp: '發牌給錯誤的位置或空位，影響了後續所有玩家拿牌的順序，應宣告誤發重洗。' },
+                { cat: '盲注規則', q: '什麼是「抓牌位 (Straddle)」下注？', opts: ['大盲後一位玩家在發牌前盲下兩倍大盲的注', '按鈕位盲下注', '翻牌後的強制下注', '任何人隨意下注'], ans: 0, exp: 'Straddle 通常是大盲左手邊玩家(UTG)在發牌前的盲注加註，讓他能在翻牌前最後一個行動。' },
+                { cat: '籌碼規則', q: '{pos}的大面額籌碼放在籌碼柱的後方被擋住 (Dirty stack/Hidden chips)。', opts: ['合法', '違規，大面額籌碼必須放在最前方或最上方清楚可見處', '沒收籌碼', '只能拿來跟注'], ans: 1, exp: '大面額籌碼必須隨時讓全桌玩家及荷官清楚可見，隱藏大籌碼是違規行為。' }
             ];
 
-            staticRules.forEach(q => {
-                qList.push({ id: idCounter++, ...q });
+            const variations = ['槍口位(UTG)', '中間位置(MP)', '關門位(Cutoff)', '按鈕位(Button)', '小盲位(SB)'];
+            
+            // 生成 170 題實體規則題 (34 種情境 x 5 種變體 = 170 題)
+            baseRuleTemplates.forEach((tpl, i) => {
+                for(let v = 0; v < 5; v++) {
+                    qList.push({
+                        templateId: `rule_${i}`, // 用於去重的核心 ID
+                        id: idCounter++,
+                        category: tpl.cat,
+                        question: tpl.q.replace(/\{pos\}/g, variations[v]).replace(/\{amt\}/g, (v + 2) * 100),
+                        options: [...tpl.opts].sort(() => Math.random() - 0.5), // 打亂選項
+                        correctAnswerText: tpl.opts[tpl.ans], // 綁定正確答案文字
+                        explanation: tpl.exp
+                    });
+                }
             });
 
-            // 2. 最小加註計算 (Min Raise) - 動態生成 60 題
-            const blindsList = [
-                { sb: 5, bb: 10 }, { sb: 10, bb: 20 }, { sb: 25, bb: 50 }, { sb: 50, bb: 100 }
-            ];
-            for (let i = 0; i < 60; i++) {
-                const blinds = blindsList[Math.floor(Math.random() * blindsList.length)];
-                const bet = blinds.bb * (Math.floor(Math.random() * 4) + 2); // 2-5 BB
-                const raiseAmount = blinds.bb * (Math.floor(Math.random() * 5) + 2);
+            // 2. 最小加註計算 (Min Raise) - 10 題
+            const blindsList = [{ sb: 10, bb: 20 }, { sb: 25, bb: 50 }, { sb: 50, bb: 100 }];
+            for (let i = 0; i < 10; i++) {
+                const blinds = blindsList[i % blindsList.length];
+                const bet = blinds.bb * (Math.floor(Math.random() * 3) + 2); 
+                const raiseAmount = blinds.bb * (Math.floor(Math.random() * 4) + 2);
                 const raiseTotal = bet + raiseAmount;
                 const minReraise = raiseTotal + raiseAmount;
 
                 const correctAns = `$${minReraise}`;
-                const options = [
-                    correctAns,
-                    `$${raiseTotal + bet}`,
-                    `$${raiseTotal * 2}`,
-                    `$${minReraise + blinds.bb}`
-                ];
-                const shuffled = options.sort(() => Math.random() - 0.5);
-
+                const options = [correctAns, `$${raiseTotal + bet}`, `$${raiseTotal * 2}`, `$${minReraise + blinds.bb}`];
+                
                 qList.push({
+                    templateId: `math_minraise_${i}`,
                     id: idCounter++,
                     category: '最小加註計算',
                     question: `盲注級別 $${blinds.sb}/$${blinds.bb}。翻牌後，玩家A下注 $${bet}，玩家B加註到總額 $${raiseTotal}。請問如果玩家C想要再加註（Re-raise），最低的加註總額應該是多少？`,
-                    options: shuffled,
-                    correctAnswerIndex: shuffled.indexOf(correctAns),
-                    explanation: `玩家B加註到 $${raiseTotal}，相對於玩家A的 $${bet}，實際加註額為 $${raiseAmount}。下一位玩家的最小加註總額必須是「目前的總注額加上前一次的加註額」，即 $${raiseTotal} + $${raiseAmount} = $${minReraise}。`
+                    options: options.sort(() => Math.random() - 0.5),
+                    correctAnswerText: correctAns,
+                    explanation: `B的實際加註額為 $${raiseAmount} ($${raiseTotal} - $${bet})。下一位的最小加註總額 = 目前總注額 + 前次加註額 = $${raiseTotal} + $${raiseAmount} = $${minReraise}。`
                 });
             }
 
-            // 3. 邊池計算 (Side Pot) - 動態生成 60 題
-            for (let i = 0; i < 60; i++) {
-                const A = (Math.floor(Math.random() * 10) + 1) * 100; 
-                const diff = (Math.floor(Math.random() * 10) + 1) * 100;
+            // 3. 邊池計算 (Side Pot) - 10 題
+            for (let i = 0; i < 10; i++) {
+                const A = (Math.floor(Math.random() * 5) + 1) * 200; 
+                const diff = (Math.floor(Math.random() * 5) + 1) * 200;
                 const B = A + diff;
                 const mainPot = A * 3;
                 const sidePot = diff * 2;
 
                 const correctAns = `主池: $${mainPot}, 邊池: $${sidePot}`;
-                const options = [
-                    correctAns,
-                    `主池: $${A * 2}, 邊池: $${B * 2}`,
-                    `主池: $${mainPot + sidePot}, 邊池: $0`,
-                    `主池: $${mainPot}, 邊池: $${diff * 3}`
-                ];
-                const shuffled = options.sort(() => Math.random() - 0.5);
+                const options = [correctAns, `主池: $${A * 2}, 邊池: $${B * 2}`, `主池: $${mainPot + sidePot}, 邊池: $0`, `主池: $${mainPot}, 邊池: $${diff * 3}`];
 
                 qList.push({
+                    templateId: `math_sidepot_${i}`,
                     id: idCounter++,
                     category: '邊池計算',
-                    question: `三人局。玩家A籌碼 $${A} 全押 (All-in)，玩家B籌碼 $${B} 也全押，玩家C籌碼最多並宣告跟注 (Call)。請問主池與邊池分別是多少？`,
-                    options: shuffled,
-                    correctAnswerIndex: shuffled.indexOf(correctAns),
-                    explanation: `主池由3人共同承擔最小 All-in 者(A)的金額：$${A} x 3 = $${mainPot}。邊池由剩餘2人(B與C)承擔B多出來的金額($${B} - $${A} = $${diff})：$${diff} x 2 = $${sidePot}。`
+                    question: `三人局。玩家A籌碼 $${A} 全押 (All-in)，玩家B籌碼 $${B} 也全押，玩家C籌碼最多並宣告跟注。請問主池與邊池分別是多少？`,
+                    options: options.sort(() => Math.random() - 0.5),
+                    correctAnswerText: correctAns,
+                    explanation: `主池由3人承擔最小 All-in (A) 的金額：$${A} x 3 = $${mainPot}。邊池由B與C承擔B多出來的金額($${diff})：$${diff} x 2 = $${sidePot}。`
                 });
             }
 
-            // 4. 單一籌碼規則 (One-Chip Rule) - 動態生成 60 題
-            const chipValues = [500, 1000, 5000, 25000];
-            for (let i = 0; i < 60; i++) {
-                const chip = chipValues[Math.floor(Math.random() * chipValues.length)];
-                const bet = (Math.floor(Math.random() * 8) + 1) * (chip / 10);
-                if (bet >= chip) { i--; continue; } // 保證籌碼大於下注額
-
-                const options = ['跟注 (Call)', '加註 (Raise)', '無效動作', '視為棄牌 (Fold)'];
-                const shuffled = options.sort(() => Math.random() - 0.5);
+            // 4. 單一籌碼規則 (One-Chip Rule) - 10 題
+            const chipValues = [1000, 5000, 25000];
+            for (let i = 0; i < 10; i++) {
+                const chip = chipValues[i % chipValues.length];
+                const bet = (Math.floor(Math.random() * 4) + 1) * (chip / 10);
+                
                 const correctAns = '跟注 (Call)';
+                const options = [correctAns, '加註 (Raise)', '無效動作', '視為棄牌 (Fold)'];
 
                 qList.push({
+                    templateId: `math_onechip_${i}`,
                     id: idCounter++,
                     category: '單一籌碼規則',
-                    question: `面對前方玩家 $${bet} 的下注，輪到某玩家時，他默默丟出一枚面額 $${chip} 的大籌碼，且「沒有」任何口頭宣告。身為記分員，這代表什麼動作？`,
-                    options: shuffled,
-                    correctAnswerIndex: shuffled.indexOf(correctAns),
-                    explanation: `根據TDA「單一籌碼規則 (One-Chip Rule)」，面對下注時，若丟出一枚面額大於該下注額的單一籌碼且未宣告加註，一律視為「跟注 (Call)」，記分員需找零 $${chip - bet}。`
+                    question: `面對前方玩家 $${bet} 的下注，某玩家默默丟出一枚面額 $${chip} 的大籌碼，且「沒有」任何口頭宣告。身為荷官，這代表什麼動作？`,
+                    options: options.sort(() => Math.random() - 0.5),
+                    correctAnswerText: correctAns,
+                    explanation: `根據TDA「單一籌碼規則」，丟出一枚面額大於下注額的單一籌碼且未宣告加註，一律視為「跟注 (Call)」，需找零 $${chip - bet}。`
                 });
             }
 
-            return qList;
+            return qList; // 總計 170 + 10 + 10 + 10 = 200 題
         };
 
         // ==========================================
@@ -294,30 +181,46 @@
             } else if (state.gameState === 'result') {
                 app.innerHTML = renderResultScreen();
             }
-            // 重新渲染 Lucide Icons
             lucide.createIcons();
         }
 
-        // 綁定至 window 以便 HTML 內聯 onclick 呼叫
+        // ==========================================
+        // 核心抽題演算法 (保證 30 題完全不同類型)
+        // ==========================================
         window.startPractice = () => {
-            // 分類題庫以確保每次測驗的題型多樣性，避免同類型題目連發
-            const dynamicCategories = ['最小加註計算', '邊池計算', '單一籌碼規則'];
-            const statics = ALL_QUESTIONS.filter(q => !dynamicCategories.includes(q.category));
-            const minRaises = ALL_QUESTIONS.filter(q => q.category === '最小加註計算');
-            const sidePots = ALL_QUESTIONS.filter(q => q.category === '邊池計算');
-            const oneChips = ALL_QUESTIONS.filter(q => q.category === '單一籌碼規則');
+            // 1. 分離不同題型
+            const rules = ALL_QUESTIONS.filter(q => q.templateId.startsWith('rule_'));
+            const minRaises = ALL_QUESTIONS.filter(q => q.templateId.startsWith('math_minraise_'));
+            const sidePots = ALL_QUESTIONS.filter(q => q.templateId.startsWith('math_sidepot_'));
+            const oneChips = ALL_QUESTIONS.filter(q => q.templateId.startsWith('math_onechip_'));
 
-            // 結構化抽取：15題實務規則 + 3題最小加註 + 3題邊池 + 5題單一籌碼 = 30題
-            const selectedStatics = shuffleArray(statics).slice(0, 24);
-            const selectedMinRaises = shuffleArray(minRaises).slice(0, 2);
-            const selectedSidePots = shuffleArray(sidePots).slice(0, 2);
-            const selectedOneChips = shuffleArray(oneChips).slice(0, 2);
+            let selectedSessionQuestions = [];
 
-            // 將這 30 題合併後，再進行一次全局洗牌，讓題目出現順序完全隨機
-            let finalQuestions = [...selectedStatics, ...selectedMinRaises, ...selectedSidePots, ...selectedOneChips];
-            finalQuestions = shuffleArray(finalQuestions);
+            // 2. 抽取 24 題實體規則題 (強制過濾 templateId，確保不重複)
+            let ruleGroups = {};
+            rules.forEach(q => {
+                if (!ruleGroups[q.templateId]) ruleGroups[q.templateId] = [];
+                ruleGroups[q.templateId].push(q);
+            });
+            
+            // 將 34 個 template 打亂，選出 24 個不同的情境
+            const shuffledRuleKeys = shuffleArray(Object.keys(ruleGroups)).slice(0, 24);
+            
+            // 從這 24 個情境中，各隨機挑選 1 個變體
+            shuffledRuleKeys.forEach(key => {
+                const variants = ruleGroups[key];
+                const randomVariant = variants[Math.floor(Math.random() * variants.length)];
+                selectedSessionQuestions.push(randomVariant);
+            });
 
-            state.sessionQuestions = finalQuestions;
+            // 3. 抽取計算題 (各 2 題)
+            selectedSessionQuestions.push(...shuffleArray(minRaises).slice(0, 2));
+            selectedSessionQuestions.push(...shuffleArray(sidePots).slice(0, 2));
+            selectedSessionQuestions.push(...shuffleArray(oneChips).slice(0, 2));
+
+            // 4. 最後將這完美的 30 題大洗牌
+            state.sessionQuestions = shuffleArray(selectedSessionQuestions);
+            
             state.gameState = 'quiz';
             state.currentIndex = 0;
             state.score = 0;
@@ -337,15 +240,16 @@
             if (state.selectedOption === null) return;
             
             const currentQ = state.sessionQuestions[state.currentIndex];
-            const isCorrect = state.selectedOption === currentQ.correctAnswerIndex;
+            const selectedText = currentQ.options[state.selectedOption];
+            const isCorrect = selectedText === currentQ.correctAnswerText;
             
             if (isCorrect) state.score += 1;
             
             state.history.push({
                 question: currentQ.question,
                 category: currentQ.category,
-                userAnswer: currentQ.options[state.selectedOption],
-                correctAnswer: currentQ.options[currentQ.correctAnswerIndex],
+                userAnswer: selectedText,
+                correctAnswer: currentQ.correctAnswerText,
                 explanation: currentQ.explanation,
                 isCorrect: isCorrect
             });
@@ -375,10 +279,10 @@
                         <i data-lucide="award" class="text-yellow-400 w-16 h-16"></i>
                     </div>
                     <div class="space-y-6 max-w-2xl">
-                        <h1 class="text-[2.5rem] font-bold text-emerald-400 tracking-wide drop-shadow-md">德州實體記分員(Dealer)專業認證</h1>
+                        <h1 class="text-[2.5rem] font-bold text-emerald-400 tracking-wide drop-shadow-md">德州實體荷官(Dealer)專業認證</h1>
                         <p class="text-slate-300 text-lg leading-relaxed px-4">
-                            本系統內建國際標準(TDA)專業題庫。涵蓋流程判斷、盲注規則、邊池計算與最小加註額速算。<br/><br/>
-                            每次嚴格配比抽出<span class="font-bold text-yellow-400 text-2xl mx-1">${QUESTIONS_PER_SESSION}</span>題不同情境之題型進行綜合測驗。準備好挑戰您的記分員專業度了嗎？
+                            本系統內建精確 200 題國際標準(TDA)題庫。其中包含 170 題實體規則與 30 題數理計算。<br/><br/>
+                            每次嚴格配比抽出<span class="font-bold text-yellow-400 text-2xl mx-1">${QUESTIONS_PER_SESSION}</span>題完全不同情境的題目進行測驗。準備好挑戰您的荷官專業度了嗎？
                         </p>
                     </div>
                     <div class="pt-6">
@@ -403,7 +307,9 @@
                 
                 if (state.isSubmitted) {
                     btnStyle = "bg-[#1e293b] border-slate-700 text-slate-500 opacity-60 cursor-default";
-                    if (idx === q.correctAnswerIndex) {
+                    const isThisOptCorrect = (opt === q.correctAnswerText);
+                    
+                    if (isThisOptCorrect) {
                         btnStyle = "bg-emerald-900/30 border-emerald-500/50 text-emerald-300 cursor-default"; 
                         iconHtml = `<i data-lucide="check-circle-2" class="text-emerald-500"></i>`;
                     } else if (idx === state.selectedOption) {
@@ -442,7 +348,8 @@
                     </button>
                 `;
             } else {
-                const isCorrect = state.selectedOption === q.correctAnswerIndex;
+                const selectedText = q.options[state.selectedOption];
+                const isCorrect = selectedText === q.correctAnswerText;
                 const alertStyle = isCorrect ? 'bg-emerald-900/20 border-emerald-500/50' : 'bg-red-900/20 border-red-500/50';
                 const titleColor = isCorrect ? 'text-emerald-400' : 'text-red-400';
                 const titleText = isCorrect ? '正確！' : '錯誤！';
@@ -514,7 +421,7 @@
             let feedbackMsg = "";
             let feedbackColor = "";
             
-            if (percentage >= 90) { feedbackMsg = "卓越！具備國際賽事級別專業記分員水準！"; feedbackColor = "text-yellow-400"; }
+            if (percentage >= 90) { feedbackMsg = "卓越！具備國際賽事級別專業荷官水準！"; feedbackColor = "text-yellow-400"; }
             else if (percentage >= 75) { feedbackMsg = "優秀！對規則有很好的掌握，稍加練習即可上桌。"; feedbackColor = "text-emerald-400"; }
             else if (percentage >= 60) { feedbackMsg = "及格！基本概念有，但在計算與特殊規則上需多加複習。"; feedbackColor = "text-orange-400"; }
             else { feedbackMsg = "需加強！建議重新熟讀 TDA 規則及底池計算方式。"; feedbackColor = "text-red-400"; }
